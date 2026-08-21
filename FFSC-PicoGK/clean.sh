@@ -2,7 +2,7 @@
 # clean.sh - Clean build artifacts
 
 set -e
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 echo "=== Cleaning FFSC_PicoGK ==="
 dotnet clean PicoGKExamples.csproj

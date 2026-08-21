@@ -18,4 +18,16 @@
     <None Include="*.sh" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="01_GettingStarted\**\*.cs" />
+    <Compile Remove="FFSC-PicoGK\FFSC_PicoGK.TestRunner\**\*.cs" />
+    <Compile Remove="GeometryII\**\*.cs" />
+    <Compile Remove="EngineFFSC\**\*.cs" />
+    <Compile Remove="rocket\**\*.cs" />
+    <Compile Remove="analysis\**\*.cs" />
+    <None Include="FFSC-PicoGK\**\*.json" />
+    <None Include="FFSC-PicoGK\**\*.md" />
+    <None Include="FFSC-PicoGK\**\*.sh" />
+  </ItemGroup>
+
 </Project>
