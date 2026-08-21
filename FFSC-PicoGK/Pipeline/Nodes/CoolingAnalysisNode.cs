@@ -13,8 +13,13 @@ public class CoolingAnalysisNode : ITask<CoolingTaskInput, CoolingMap>
     public string Id => "cooling_analysis";
     public string Name => "Cooling Heat Transfer Analysis";
 
-    public CoolingMap Execute(CoolingTaskInput input)
+    public CoolingMap Run(CoolingTaskInput input)
     {
         return CoolingTask.Run(input.Params, input.Thermo);
+    }
+
+    public CoolingMap Execute(CoolingTaskInput input)
+    {
+        return Run(input);
     }
 }

@@ -13,8 +13,13 @@ public class GeometryManifoldFFSCNode : ITask<Unit, Voxels>
     public string Id => "geom_manifold_ffsc";
     public string Name => "FFSC Manifold Geometry";
 
-    public Voxels Execute(Unit input)
+    public Voxels Run(Unit input)
     {
         return Geometry_Manifold_FFSC.Create();
+    }
+
+    public Voxels Execute(Unit input)
+    {
+        return Run(input);
     }
 }

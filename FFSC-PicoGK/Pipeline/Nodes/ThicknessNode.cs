@@ -12,8 +12,13 @@ public class ThicknessNode : ITask<ThicknessTaskInput, ThicknessMap>
     public string Id => "thickness";
     public string Name => "Structural Thickness Calculation";
 
-    public ThicknessMap Execute(ThicknessTaskInput input)
+    public ThicknessMap Run(ThicknessTaskInput input)
     {
         return ComputeThicknessTask.Run(input.Params, input.Thermo);
+    }
+
+    public ThicknessMap Execute(ThicknessTaskInput input)
+    {
+        return Run(input);
     }
 }

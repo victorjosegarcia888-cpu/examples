@@ -12,8 +12,13 @@ public class ThermoNode : ITask<ThermoTaskInput, ThermoMap>
     public string Id => "thermo";
     public string Name => "Thermodynamic Analysis";
 
-    public ThermoMap Execute(ThermoTaskInput input)
+    public ThermoMap Run(ThermoTaskInput input)
     {
         return ComputeThermoTask.Run(input.Params);
+    }
+
+    public ThermoMap Execute(ThermoTaskInput input)
+    {
+        return Run(input);
     }
 }

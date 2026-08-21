@@ -12,8 +12,13 @@ public class TurbopumpDesignNode : ITask<TurbopumpTaskInput, TurbopumpDesign>
     public string Id => "turbopump_design";
     public string Name => "Turbopump Design";
 
-    public TurbopumpDesign Execute(TurbopumpTaskInput input)
+    public TurbopumpDesign Run(TurbopumpTaskInput input)
     {
         return TurbopumpDesigner.Run(input.Params, input.MassFlowOxidizer);
+    }
+
+    public TurbopumpDesign Execute(TurbopumpTaskInput input)
+    {
+        return Run(input);
     }
 }

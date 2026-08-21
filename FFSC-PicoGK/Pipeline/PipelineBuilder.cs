@@ -23,7 +23,7 @@ public static class PipelineBuilder
 
         foreach (var nodeId in graph.NodeIds)
         {
-            if (!graph.TryGetNode(nodeId, out Node? node))
+            if (!graph.TryGetNode(nodeId, out Node? node) || node is null)
                 continue;
 
             node.InputFactory = node.Id switch

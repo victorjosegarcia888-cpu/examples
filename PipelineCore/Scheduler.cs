@@ -98,7 +98,7 @@ public class Scheduler
 
         Type taskType = Type.GetType(taskTypeName) ?? throw new PipelineException($"Cannot load task type: {taskTypeName}");
 
-        var executeMethod = taskType.GetMethod("Execute") ?? throw new PipelineException($"Execute method not found in: {taskTypeName}");
+        var executeMethod = taskType.GetMethod("Run") ?? throw new PipelineException($"Run method not found in: {taskTypeName}");
 
         return executeMethod.Invoke(null, new[] { input }) ?? throw new PipelineException($"Task {node.Id} returned null.");
     }
@@ -127,7 +127,7 @@ public class Scheduler
             if (!context.TryGet<object>(depId, out object? value))
                 throw new PipelineException($"Dependency not found: {depId} for node {node.Id}");
 
-            values[i] = value;
+            values[i] = value!;
         }
 
         return values;

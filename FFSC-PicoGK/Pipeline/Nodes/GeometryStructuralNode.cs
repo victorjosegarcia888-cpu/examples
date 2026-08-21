@@ -13,8 +13,13 @@ public class GeometryStructuralNode : ITask<Unit, Voxels>
     public string Id => "geom_structural";
     public string Name => "Structural Frame";
 
-    public Voxels Execute(Unit input)
+    public Voxels Run(Unit input)
     {
         return Geometry_Structural.Create();
+    }
+
+    public Voxels Execute(Unit input)
+    {
+        return Run(input);
     }
 }

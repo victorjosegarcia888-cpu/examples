@@ -136,9 +136,15 @@ public static class Test_PipelineCore
             if (System.IO.File.Exists(pipelinePath))
             {
                 var graph = PipelineLoader.Load(pipelinePath);
-                AssertTrue("PipelineLoader.Load != null", graph != null);
-                AssertTrue("PipelineLoader.NodeCount > 0", graph.NodeIds.Count > 0);
-                AssertTrue("PipelineLoader.HasFinalOutput", graph.NodeIds.Contains("final_assembly"));
+                if (graph is not null)
+                {
+                    AssertTrue("PipelineLoader.NodeCount > 0", graph.NodeIds.Count > 0);
+                    AssertTrue("PipelineLoader.HasFinalOutput", graph.NodeIds.Contains("final_assembly"));
+                }
+                else
+                {
+                    AssertTrue("PipelineLoader.Load != null", false);
+                }
             }
             else
             {

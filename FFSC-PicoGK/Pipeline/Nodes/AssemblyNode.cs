@@ -30,7 +30,7 @@ public class AssemblyNode : ITask<AssemblyInput, Voxels>
     public string Id => "final_assembly";
     public string Name => "Final Engine Assembly";
 
-    public Voxels Execute(AssemblyInput input)
+    public Voxels Run(AssemblyInput input)
     {
         return input.Chamber + input.Nozzle + input.Aerospike +
                input.ManifoldFFSC + input.ManifoldLOX + input.ManifoldCH4 +
@@ -38,5 +38,10 @@ public class AssemblyNode : ITask<AssemblyInput, Voxels>
                input.Pipes + input.Structural + input.Supports +
                input.LatticeDual + input.LatticeQuasi +
                input.Stress + input.CFD;
+    }
+
+    public Voxels Execute(AssemblyInput input)
+    {
+        return Run(input);
     }
 }

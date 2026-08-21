@@ -13,8 +13,13 @@ public class GeometryTurbopumpNode : ITask<ThermoTaskInput, Voxels>
     public string Id => "geom_turbopump";
     public string Name => "Turbopump Geometry";
 
-    public Voxels Execute(ThermoTaskInput input)
+    public Voxels Run(ThermoTaskInput input)
     {
         return Geometry_Turbopump.Create(input.Params);
+    }
+
+    public Voxels Execute(ThermoTaskInput input)
+    {
+        return Run(input);
     }
 }

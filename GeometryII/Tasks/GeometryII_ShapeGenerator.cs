@@ -20,7 +20,7 @@ public class GeometryII_ShapeGeneratorTask : ITask<ShapeGeneratorInput, Voxels>
     public string Id => "geometryii_shape_generator";
     public string Name => "GeometryII Shape Generator";
 
-    public Voxels Execute(ShapeGeneratorInput input)
+    public Voxels Run(ShapeGeneratorInput input)
     {
         return input.ShapeType.ToLower() switch
         {
@@ -30,6 +30,11 @@ public class GeometryII_ShapeGeneratorTask : ITask<ShapeGeneratorInput, Voxels>
             "box" => GenerateBox(input.Radius, input.Height),
             _ => GenerateSphere(input.Radius, input.Segments)
         };
+    }
+
+    public Voxels Execute(ShapeGeneratorInput input)
+    {
+        return Run(input);
     }
 
     private Voxels GenerateSphere(double radius, int segments)

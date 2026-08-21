@@ -13,11 +13,16 @@ public class LatticeQuasiNode : ITask<LatticeQuasiInput, Voxels>
     public string Id => "lattice_quasi";
     public string Name => "Quasicrystal Lattice";
 
-    public Voxels Execute(LatticeQuasiInput input)
+    public Voxels Run(LatticeQuasiInput input)
     {
         return Lattice_Quasicrystal.Generate(
             input.StressField,
             input.Scale,
             input.Intensity);
+    }
+
+    public Voxels Execute(LatticeQuasiInput input)
+    {
+        return Run(input);
     }
 }

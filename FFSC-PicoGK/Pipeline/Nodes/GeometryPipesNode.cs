@@ -13,8 +13,13 @@ public class GeometryPipesNode : ITask<Unit, Voxels>
     public string Id => "geom_pipes";
     public string Name => "Feed System Pipes";
 
-    public Voxels Execute(Unit input)
+    public Voxels Run(Unit input)
     {
         return Geometry_Pipes.Create();
+    }
+
+    public Voxels Execute(Unit input)
+    {
+        return Run(input);
     }
 }

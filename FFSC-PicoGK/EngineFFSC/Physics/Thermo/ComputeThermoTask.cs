@@ -19,7 +19,7 @@ namespace FFSC_PicoGK.Physics.Thermo
 
     public class ThermoMap
     {
-        public ThermoPoint[] Points;
+        public required ThermoPoint[] Points;
     }
 
     public static class ComputeThermoTask

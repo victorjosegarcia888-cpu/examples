@@ -13,8 +13,13 @@ public class GeometryInjectorsNode : ITask<ThermoTaskInput, Voxels>
     public string Id => "geom_injectors";
     public string Name => "Injectors Geometry";
 
-    public Voxels Execute(ThermoTaskInput input)
+    public Voxels Run(ThermoTaskInput input)
     {
         return Geometry_Injectors.Create(input.Params);
+    }
+
+    public Voxels Execute(ThermoTaskInput input)
+    {
+        return Run(input);
     }
 }

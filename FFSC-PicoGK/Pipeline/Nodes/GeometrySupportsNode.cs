@@ -13,8 +13,13 @@ public class GeometrySupportsNode : ITask<Unit, Voxels>
     public string Id => "geom_supports";
     public string Name => "Engine Supports";
 
-    public Voxels Execute(Unit input)
+    public Voxels Run(Unit input)
     {
         return Geometry_Supports.Create();
+    }
+
+    public Voxels Execute(Unit input)
+    {
+        return Run(input);
     }
 }

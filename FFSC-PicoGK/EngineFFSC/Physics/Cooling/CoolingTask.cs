@@ -19,7 +19,7 @@ namespace FFSC_PicoGK.Physics.Cooling
 
     public class CoolingMap
     {
-        public CoolingPoint[] Points;
+        public required CoolingPoint[] Points;
     }
 
     public static class CoolingTask

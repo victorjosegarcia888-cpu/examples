@@ -57,7 +57,7 @@ public static class PipelineLoader
 
         foreach (string outputId in definition.OutputNodes ?? new List<string>())
         {
-            if (graph.TryGetNode(outputId, out Node? node))
+            if (graph.TryGetNode(outputId, out Node? node) && node is not null)
             {
                 node.IsFinalOutput = true;
             }

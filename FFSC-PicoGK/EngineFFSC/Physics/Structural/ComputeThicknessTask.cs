@@ -17,7 +17,7 @@ namespace FFSC_PicoGK.Physics.Structural
 
     public class ThicknessMap
     {
-        public ThicknessPoint[] Points;
+        public required ThicknessPoint[] Points;
     }
 
     public static class ComputeThicknessTask

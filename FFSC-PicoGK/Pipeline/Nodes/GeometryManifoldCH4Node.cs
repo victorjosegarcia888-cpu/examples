@@ -13,8 +13,13 @@ public class GeometryManifoldCH4Node : ITask<Unit, Voxels>
     public string Id => "geom_manifold_ch4";
     public string Name => "CH4 Manifold Geometry";
 
-    public Voxels Execute(Unit input)
+    public Voxels Run(Unit input)
     {
         return Geometry_Manifold_CH4.Create();
+    }
+
+    public Voxels Execute(Unit input)
+    {
+        return Run(input);
     }
 }
