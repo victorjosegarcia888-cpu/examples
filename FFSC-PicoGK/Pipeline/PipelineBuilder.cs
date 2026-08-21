@@ -96,6 +96,18 @@ public static class PipelineBuilder
                     ctx.Get<Voxels>("CamaraCombustion")!,
                     ctx.Get<Voxels>("PreBurner")!,
                     ctx.Get<Voxels>("CamposFisicos")!),
+                "OrganicManifold" => ctx => new OrganicManifoldInput(
+                    ctx.Get<Voxels>("ManifoldPrincipal")!,
+                    ctx.Get<Voxels>("CamposFisicos")!),
+                "FractalPostProcess" => ctx => new FractalPostProcessInput(
+                    ctx.Get<Voxels>("CamaraCombustion")!,
+                    ctx.Get<Voxels>("PreBurner")!,
+                    ctx.Get<Voxels>("ManifoldPrincipal")!,
+                    ctx.Get<Voxels>("Turbobomba")!,
+                    ctx.Get<Voxels>("CoolingRegenerativo")!,
+                    ctx.Get<Voxels>("LatticeAdaptativo")!,
+                    ctx.Get<Voxels>("CamposFisicos")!,
+                    ctx.Get<Voxels>("OrganicManifold")!),
                 "AssemblyFFSC" => ctx => new AssemblyFFSCInput(
                     ctx.Get<Voxels>("CamaraCombustion")!,
                     ctx.Get<Voxels>("PreBurner")!,
@@ -103,7 +115,8 @@ public static class PipelineBuilder
                     ctx.Get<Voxels>("Turbobomba")!,
                     ctx.Get<Voxels>("CoolingRegenerativo")!,
                     ctx.Get<Voxels>("LatticeAdaptativo")!,
-                    ctx.Get<Voxels>("CamposFisicos")!),
+                    ctx.Get<Voxels>("CamposFisicos")!,
+                    ctx.Get<Voxels>("FractalPostProcess")!),
                 "VisualizarMotor" => ctx => new VisualizarMotorInput(
                     ctx.Get<Voxels>("AssemblyFFSC")!),
                 _ => null
@@ -153,7 +166,10 @@ public static class PipelineBuilder
         registry.Register("CamposFisicos", new Nodo_CamposFisicos());
         registry.Register("CoolingRegenerativo", new Nodo_CoolingRegenerativo());
         registry.Register("LatticeAdaptativo", new Nodo_LatticeAdaptativo());
+        registry.Register("OrganicManifold", new Nodo_OrganicManifold());
+        registry.Register("FractalPostProcess", new Nodo_FractalPostProcess());
         registry.Register("AssemblyFFSC", new Nodo_AssemblyFFSC());
         registry.Register("VisualizarMotor", new Nodo_VisualizarMotor());
     }
 }
+

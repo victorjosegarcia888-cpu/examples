@@ -1,81 +1,97 @@
 # Graph Dependencies
 
-## Module Dependency Graph
+## Noyron/Powder Large-Node Graph
 
 ```
-PipelineCore
-    ├── EngineSpec
-    ├── Geometry
-    │       ├── EngineSpec
-    │       ├── Turbopump (for turbopump geometry)
-    │       └── ShapeKernel (optional, for advanced primitives)
-    ├── Physics
-    │       ├── EngineSpec
-    │       ├── Geometry (for stress/CFD inputs)
-    │       └── Turbopump (for pump design)
-    ├── Turbopump
-    │       ├── EngineSpec
-    │       └── Geometry (for voxel generation)
-    ├── Assembly
-    │       ├── Geometry
-    │       ├── Physics
-    │       ├── Turbopump
-    │       └── EngineSpec
-    └── Viewer
-            ├── Assembly
-            └── PipelineCore
+Nodo_CamaraCombustion (standalone)
+Nodo_PreBurner (standalone)
+Nodo_ManifoldPrincipal (standalone)
+Nodo_Turbobomba (standalone)
+    │
+    ├──► Nodo_CamposFisicos
+    │       ├── Nodo_CoolingRegenerativo
+    │       │       └──► Nodo_AssemblyFFSC ◄────────────┐
+    │       └── Nodo_LatticeAdaptativo                   │
+    │               └──► Nodo_AssemblyFFSC ◄────────────┘
+    │
+    ├──► Nodo_AssemblyFFSC
+    │
+    └──► Nodo_AssemblyFFSC
+            │
+            ▼
+    Nodo_VisualizarMotor (final output)
 ```
 
-## Node Dependency Matrix
+## Node Dependency Matrix (Noyron Architecture)
 
-| Node | Dependencies | Provides To |
-|------|-------------|-------------|
-| load_params | - | thermo, thickness, turbopump_design, geom_chamber, geom_nozzle, geom_injectors, geom_turbopump, lattice_dual |
-| thermo | load_params | thickness, cooling_analysis |
-| thickness | load_params, thermo | - |
-| turbopump_design | load_params | - |
-| geom_chamber | load_params | geom_cooling, physics_stress, physics_cfd, final_assembly |
-| geom_nozzle | load_params | physics_cfd, final_assembly |
-| geom_aerospike | - | geom_cooling, physics_stress, physics_cfd, final_assembly |
-| geom_manifold_ffsc | - | physics_stress, physics_cfd, final_assembly |
-| geom_manifold_lox | - | final_assembly |
-| geom_manifold_ch4 | - | final_assembly |
-| geom_injectors | load_params | final_assembly |
-| geom_turbopump | load_params | final_assembly |
-| geom_cooling | geom_chamber, geom_aerospike | final_assembly |
-| geom_pipes | - | final_assembly |
-| geom_structural | - | final_assembly |
-| geom_supports | - | final_assembly |
-| physics_stress | geom_chamber, geom_aerospike, geom_manifold_ffsc | lattice_dual, lattice_quasi, final_assembly |
-| physics_cfd | geom_chamber, geom_nozzle, geom_aerospike, geom_manifold_ffsc | final_assembly |
-| cooling_analysis | load_params, thermo | - |
-| lattice_dual | physics_stress, load_params | final_assembly |
-| lattice_quasi | physics_stress | final_assembly |
-| final_assembly | 16 geometry/physics nodes | - |
+| Nodo | Agentes Internos | Dependencies | Provides To | Input Tipado | Output Tipado |
+|------|-----------------|--------------|-------------|--------------|---------------|
+| CamaraCombustion | Geometry, Cooling, Lattice, Physics, Validation | - | CamposFisicos, CoolingRegenerativo, LatticeAdaptativo, AssemblyFFSC | `Unit` | `Voxels` |
+| PreBurner | Geometry, Cooling, Lattice, Physics | - | CamposFisicos, CoolingRegenerativo, LatticeAdaptativo, AssemblyFFSC | `Unit` | `Voxels` |
+| ManifoldPrincipal | Geometry, Flow, Validation | - | CamposFisicos, AssemblyFFSC | `Unit` | `Voxels` |
+| Turbobomba | Geometry, Impeller, Shaft, Cooling, Physics | - | CamposFisicos, AssemblyFFSC | `Unit` | `Voxels` |
+| CamposFisicos | Physics, CFDProxy | CamaraCombustion, PreBurner, ManifoldPrincipal, Turbobomba | CoolingRegenerativo, LatticeAdaptativo, AssemblyFFSC | `CamposFisicosInput` | `Voxels` |
+| CoolingRegenerativo | Cooling, Physics, Flow | CamaraCombustion, PreBurner, CamposFisicos | AssemblyFFSC | `CoolingRegenerativoInput` | `Voxels` |
+| LatticeAdaptativo | Lattice, ThermalGradient | CamaraCombustion, PreBurner, CamposFisicos | AssemblyFFSC | `LatticeAdaptativoInput` | `Voxels` |
+| AssemblyFFSC | Assembly, Interface, Validation | Todos los anteriores | VisualizarMotor | `AssemblyFFSCInput` | `Voxels` |
+| VisualizarMotor | Visualization | AssemblyFFSC | - | `VisualizarMotorInput` | `Voxels` |
 
-## Data Type Flow
+## Edge List (18 edges)
+
+| Source | Target | Data Flow |
+|--------|--------|-----------|
+| CamaraCombustion | CamposFisicos | Voxels |
+| CamaraCombustion | CoolingRegenerativo | Voxels |
+| CamaraCombustion | LatticeAdaptativo | Voxels |
+| CamaraCombustion | AssemblyFFSC | Voxels |
+| PreBurner | CamposFisicos | Voxels |
+| PreBurner | CoolingRegenerativo | Voxels |
+| PreBurner | LatticeAdaptativo | Voxels |
+| PreBurner | AssemblyFFSC | Voxels |
+| ManifoldPrincipal | CamposFisicos | Voxels |
+| ManifoldPrincipal | AssemblyFFSC | Voxels |
+| Turbobomba | CamposFisicos | Voxels |
+| Turbobomba | AssemblyFFSC | Voxels |
+| CamposFisicos | CoolingRegenerativo | Voxels |
+| CamposFisicos | LatticeAdaptativo | Voxels |
+| CamposFisicos | AssemblyFFSC | Voxels |
+| CoolingRegenerativo | AssemblyFFSC | Voxels |
+| LatticeAdaptativo | AssemblyFFSC | Voxels |
+| AssemblyFFSC | VisualizarMotor | Voxels |
+
+## Data Type Flow (Noyron)
 
 ```
-EngineParams (IEngineSpec)
-    ├── ThermoMap (IThermoField)
-    │       ├── ThicknessMap
-    │       ├── CoolingMap
-    │       └── ThicknessMap
-    ├── Voxels (IGeometry3D)
-    │       ├── StressField (IField3D)
-    │       │       ├── Lattice_DualLayer (ILattice3D)
-    │       │       └── Lattice_Quasicrystal (ILattice3D)
-    │       └── CFDTask (IField3D)
-    └── TurbopumpDesign
-            └── Voxels (IGeometry3D)
-
-All Voxels → AssemblyNode → Final Voxels → Viewer
+Unit (entry nodes)
+    ├── CamaraCombustion ──┐
+    ├── PreBurner ─────────┼──► CamposFisicosInput ──► CamposFisicos ──┐
+    ├── ManifoldPrincipal ──┘                                        │
+    ├── Turbobomba ───────────────────────────────────────────────────┘
+                                                                       │
+Unit (entry nodes)                                                     │
+    ├── CamaraCombustion ──────────────────────────────────────────────┤
+    ├── PreBurner ─────────────────────────────────────────────────────┤
+    ├── ManifoldPrincipal ─────────────────────────────────────────────┤
+    ├── Turbobomba ────────────────────────────────────────────────────┤
+    ├── CoolingRegenerativo ───────────────────────────────────────────┤
+    └── LatticeAdaptativo ─────────────────────────────────────────────┘
+                                                                       │
+                                                                       ▼
+                                                               AssemblyFFSCInput
+                                                                       │
+                                                                       ▼
+                                                              VisualizarMotorInput
+                                                                       │
+                                                                       ▼
+                                                            Voxels (EngineFFSC)
 ```
 
 ## Determinism Guarantees
 
-1. **No Random State**: All tasks use deterministic algorithms
-2. **Fixed Seeds**: No random number generation
-3. **Pure Functions**: Tasks have no side effects
-4. **Immutable Inputs**: Inputs are read-only records/structs
+1. **No Random State**: All agents use deterministic algorithms
+2. **Pure Functions**: Each node is a pure function `TInput -> VOutput`
+3. **Immutable Inputs**: Inputs are readonly records/structs
+4. **No Side Effects**: Nodes only produce output, no external mutation
 5. **Reproducible Outputs**: Same inputs always produce identical Voxels
+6. **Topological Order**: Scheduler respects dependencies exactly
+7. **No Global State**: No static mutable state anywhere

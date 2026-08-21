@@ -22,7 +22,7 @@ using FFSC_PicoGK.Pipeline;
 
 Library.Go(0.5f, () =>
 {
-    string pipelinePath = "Pipeline/pipeline_noyron.json";
+    string pipelinePath = "Pipeline/pipeline.json";
 
     var registry = new TaskRegistry();
     PipelineBuilder.RegisterAllTasks(registry);

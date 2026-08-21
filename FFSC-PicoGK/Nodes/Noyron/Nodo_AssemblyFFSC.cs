@@ -11,7 +11,8 @@ public record AssemblyFFSCInput(
     Voxels Turbopump,
     Voxels Cooling,
     Voxels Lattice,
-    Voxels Physics);
+    Voxels Physics,
+    Voxels FractalPostProcess);
 
 public class Nodo_AssemblyFFSC : ITask<AssemblyFFSCInput, Voxels>
 {
@@ -20,18 +21,15 @@ public class Nodo_AssemblyFFSC : ITask<AssemblyFFSCInput, Voxels>
     
     public Voxels Run(AssemblyFFSCInput input)
     {
-        // Agent 1: AssemblyAgent - Assembles all pieces
         var assemblyAgent = new AssemblyAgent();
         Voxels parts = assemblyAgent.Execute(new Voxels[] {
             input.Chamber, input.PreBurner, input.Manifold, input.Turbopump,
-            input.Cooling, input.Lattice, input.Physics
+            input.Cooling, input.Lattice, input.Physics, input.FractalPostProcess
         });
         
-        // Agent 2: InterfaceAgent - Handles interfaces between subsystems
         var interfaceAgent = new InterfaceAgent();
         Voxels withInterfaces = interfaceAgent.Execute(parts);
         
-        // Agent 3: ValidationAgent - Validates final assembly
         var validationAgent = new ValidationAgent();
         return validationAgent.Execute(withInterfaces);
     }

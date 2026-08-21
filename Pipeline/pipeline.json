@@ -1,249 +1,164 @@
 {
-  "name": "FFSC Advanced Pipeline",
-  "description": "Full-flow staged combustion rocket engine design pipeline with 7 phases",
-  "configPath": "config/engine_params.json",
+  "name": "FFSC Noyron Generative Engine Pipeline with FractalKernel",
+  "description": "Grafo completo de motor FFSC generativo basado en nodos grandes volumétricos con agentes internos, incluyendo post-procesamiento fractal y manifold orgánico",
+  "version": "2.0.0",
+  "configPath": "FFSC-PicoGK/config/engine_params.json",
   "nodes": [
     {
-      "id": "load_params",
-      "name": "Load Engine Parameters",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.LoadParamsNode",
+      "id": "CamaraCombustion",
+      "name": "Nodo Cámara de Combustión",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_CamaraCombustion",
       "dependsOn": [],
-      "input": {
-        "configPath": "config/engine_params.json"
-      },
-      "outputKey": "engine_params",
-      "isEntryPoint": true
+      "input": null,
+      "outputKey": "chamber_voxels",
+      "classification": "node",
+      "inputTypes": ["Unit"],
+      "outputTypes": ["Voxels"]
     },
     {
-      "id": "thermo",
-      "name": "Thermodynamic Analysis",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.ThermoNode",
-      "dependsOn": ["load_params"],
-      "input": {
-        "params": { "$ref": "load_params" }
-      },
-      "outputKey": "thermo_map"
-    },
-    {
-      "id": "thickness",
-      "name": "Structural Thickness Calculation",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.ThicknessNode",
-      "dependsOn": ["load_params", "thermo"],
-      "input": {
-        "params": { "$ref": "load_params" },
-        "thermo": { "$ref": "thermo" }
-      },
-      "outputKey": "thickness_map"
-    },
-    {
-      "id": "cooling_analysis",
-      "name": "Cooling Heat Transfer Analysis",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.CoolingAnalysisNode",
-      "dependsOn": ["load_params", "thermo"],
-      "input": {
-        "params": { "$ref": "load_params" },
-        "thermo": { "$ref": "thermo" }
-      },
-      "outputKey": "cooling_map"
-    },
-    {
-      "id": "turbopump_design",
-      "name": "Turbopump Design",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.TurbopumpDesignNode",
-      "dependsOn": ["load_params"],
-      "input": {
-        "params": { "$ref": "load_params" },
-        "massFlowOxidizer": 320.0
-      },
-      "outputKey": "turbopump_design"
-    },
-    {
-      "id": "geom_chamber",
-      "name": "Chamber Geometry",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryChamberNode",
-      "dependsOn": ["load_params"],
-      "input": {
-        "params": { "$ref": "load_params" }
-      },
-      "outputKey": "geom_chamber"
-    },
-    {
-      "id": "geom_nozzle",
-      "name": "Nozzle Geometry",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryNozzleNode",
-      "dependsOn": ["load_params"],
-      "input": {
-        "params": { "$ref": "load_params" }
-      },
-      "outputKey": "geom_nozzle"
-    },
-    {
-      "id": "geom_aerospike",
-      "name": "Aerospike Geometry",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryAerospikeNode",
+      "id": "PreBurner",
+      "name": "Nodo PreBurner",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_PreBurner",
       "dependsOn": [],
-      "input": {
-        "length": 0.55,
-        "baseRadius": 0.15
-      },
-      "outputKey": "geom_aerospike"
+      "input": null,
+      "outputKey": "preburner_voxels",
+      "classification": "node",
+      "inputTypes": ["Unit"],
+      "outputTypes": ["Voxels"]
     },
     {
-      "id": "geom_manifold_ffsc",
-      "name": "FFSC Manifold Geometry",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryManifoldFFSCNode",
+      "id": "ManifoldPrincipal",
+      "name": "Nodo Manifold Principal",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_ManifoldPrincipal",
       "dependsOn": [],
+      "input": null,
+      "outputKey": "manifold_voxels",
+      "classification": "node",
+      "inputTypes": ["Unit"],
+      "outputTypes": ["Voxels"]
+    },
+    {
+      "id": "Turbobomba",
+      "name": "Nodo Turbobomba",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_Turbobomba",
+      "dependsOn": [],
+      "input": null,
+      "outputKey": "turbopump_voxels",
+      "classification": "node",
+      "inputTypes": ["Unit"],
+      "outputTypes": ["Voxels"]
+    },
+    {
+      "id": "CamposFisicos",
+      "name": "Nodo Campos Físicos",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_CamposFisicos",
+      "dependsOn": ["CamaraCombustion", "PreBurner", "ManifoldPrincipal", "Turbobomba"],
       "input": {},
-      "outputKey": "geom_manifold_ffsc"
+      "outputKey": "physics_fields",
+      "classification": "node",
+      "inputTypes": ["CamposFisicosInput"],
+      "outputTypes": ["Voxels"]
     },
     {
-      "id": "geom_manifold_lox",
-      "name": "LOX Manifold Geometry",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryManifoldLOXNode",
-      "dependsOn": [],
+      "id": "CoolingRegenerativo",
+      "name": "Nodo Cooling Regenerativo",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_CoolingRegenerativo",
+      "dependsOn": ["CamaraCombustion", "PreBurner", "CamposFisicos"],
       "input": {},
-      "outputKey": "geom_manifold_lox"
+      "outputKey": "cooling_voxels",
+      "classification": "node",
+      "inputTypes": ["CoolingRegenerativoInput"],
+      "outputTypes": ["Voxels"]
     },
     {
-      "id": "geom_manifold_ch4",
-      "name": "CH4 Manifold Geometry",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryManifoldCH4Node",
-      "dependsOn": [],
+      "id": "LatticeAdaptativo",
+      "name": "Nodo Lattice Adaptativo",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_LatticeAdaptativo",
+      "dependsOn": ["CamaraCombustion", "PreBurner", "CamposFisicos"],
       "input": {},
-      "outputKey": "geom_manifold_ch4"
+      "outputKey": "lattice_voxels",
+      "classification": "node",
+      "inputTypes": ["LatticeAdaptativoInput"],
+      "outputTypes": ["Voxels"]
     },
     {
-      "id": "geom_injectors",
-      "name": "Injectors Geometry",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryInjectorsNode",
-      "dependsOn": ["load_params"],
-      "input": {
-        "params": { "$ref": "load_params" }
-      },
-      "outputKey": "geom_injectors"
-    },
-    {
-      "id": "geom_turbopump",
-      "name": "Turbopump Geometry",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryTurbopumpNode",
-      "dependsOn": ["load_params"],
-      "input": {
-        "params": { "$ref": "load_params" }
-      },
-      "outputKey": "geom_turbopump"
-    },
-    {
-      "id": "geom_cooling",
-      "name": "Cooling Channels Geometry",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryCoolingNode",
-      "dependsOn": ["geom_chamber", "geom_aerospike"],
-      "input": {
-        "chamber": { "$ref": "geom_chamber" },
-        "spike": { "$ref": "geom_aerospike" }
-      },
-      "outputKey": "geom_cooling"
-    },
-    {
-      "id": "geom_pipes",
-      "name": "Feed System Pipes",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryPipesNode",
-      "dependsOn": [],
+      "id": "OrganicManifold",
+      "name": "Nodo Organic Manifold",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_OrganicManifold",
+      "dependsOn": ["ManifoldPrincipal"],
       "input": {},
-      "outputKey": "geom_pipes"
+      "outputKey": "organic_manifold_voxels",
+      "classification": "node",
+      "inputTypes": ["OrganicManifoldInput"],
+      "outputTypes": ["Voxels"]
     },
     {
-      "id": "geom_structural",
-      "name": "Structural Frame",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryStructuralNode",
-      "dependsOn": [],
-      "input": {},
-      "outputKey": "geom_structural"
-    },
-    {
-      "id": "geom_supports",
-      "name": "Engine Supports",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometrySupportsNode",
-      "dependsOn": [],
-      "input": {},
-      "outputKey": "geom_supports"
-    },
-    {
-      "id": "physics_stress",
-      "name": "Stress Field Analysis",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.StressFieldNode",
-      "dependsOn": ["geom_chamber", "geom_aerospike", "geom_manifold_ffsc"],
-      "input": {
-        "chamber": { "$ref": "geom_chamber" },
-        "spike": { "$ref": "geom_aerospike" },
-        "manifold": { "$ref": "geom_manifold_ffsc" }
-      },
-      "outputKey": "physics_stress"
-    },
-    {
-      "id": "physics_cfd",
-      "name": "CFD Thermal Analysis",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.CFDNode",
-      "dependsOn": ["geom_chamber", "geom_nozzle", "geom_aerospike", "geom_manifold_ffsc"],
-      "input": {
-        "chamber": { "$ref": "geom_chamber" },
-        "nozzle": { "$ref": "geom_nozzle" },
-        "spike": { "$ref": "geom_aerospike" },
-        "manifold": { "$ref": "geom_manifold_ffsc" }
-      },
-      "outputKey": "physics_cfd"
-    },
-    {
-      "id": "lattice_dual",
-      "name": "Dual-Layer Lattice",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.LatticeDualNode",
-      "dependsOn": ["physics_stress", "load_params"],
-      "input": {
-        "stressField": { "$ref": "physics_stress" },
-        "highThreshold": 0.6,
-        "lowThreshold": 0.3,
-        "highRadius": 0.015,
-        "lowRadius": 0.008
-      },
-      "outputKey": "lattice_dual"
-    },
-    {
-      "id": "lattice_quasi",
-      "name": "Quasicrystal Lattice",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.LatticeQuasiNode",
-      "dependsOn": ["physics_stress"],
-      "input": {
-        "stressField": { "$ref": "physics_stress" },
-        "scale": 0.3,
-        "intensity": 0.5
-      },
-      "outputKey": "lattice_quasi"
-    },
-    {
-      "id": "geometryii_shape",
-      "name": "GeometryII Shape Generator",
-      "taskType": "GeometryII.Tasks.GeometryII_ShapeGeneratorTask",
-      "dependsOn": [],
-      "input": {
-        "radius": 0.1,
-        "height": 0.2,
-        "segments": 32,
-        "shapeType": "sphere"
-      },
-      "outputKey": "geometryii_shape"
-    },
-    {
-      "id": "final_assembly",
-      "name": "Final Engine Assembly",
-      "taskType": "FFSC_PicoGK.Pipeline.Nodes.AssemblyNode",
+      "id": "FractalPostProcess",
+      "name": "Nodo Fractal Post Process",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_FractalPostProcess",
       "dependsOn": [
-        "geom_chamber", "geom_nozzle", "geom_aerospike",
-        "geom_manifold_ffsc", "geom_manifold_lox", "geom_manifold_ch4",
-        "geom_injectors", "geom_turbopump", "geom_cooling",
-        "geom_pipes", "geom_structural", "geom_supports",
-        "physics_stress", "physics_cfd", "lattice_dual", "lattice_quasi"
+        "CamaraCombustion",
+        "PreBurner",
+        "ManifoldPrincipal",
+        "Turbobomba",
+        "CoolingRegenerativo",
+        "LatticeAdaptativo",
+        "CamposFisicos",
+        "OrganicManifold"
       ],
-      "isFinalOutput": true
+      "input": {},
+      "outputKey": "fractal_postprocess_voxels",
+      "classification": "node",
+      "inputTypes": ["FractalPostProcessInput"],
+      "outputTypes": ["Voxels"]
+    },
+    {
+      "id": "AssemblyFFSC",
+      "name": "Nodo Assembly FFSC",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_AssemblyFFSC",
+      "dependsOn": ["FractalPostProcess"],
+      "input": {},
+      "outputKey": "engine_ffsc",
+      "classification": "node",
+      "inputTypes": ["AssemblyFFSCInput"],
+      "outputTypes": ["Voxels"]
+    },
+    {
+      "id": "VisualizarMotor",
+      "name": "Nodo Visualizar Motor",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_VisualizarMotor",
+      "dependsOn": ["AssemblyFFSC"],
+      "input": {},
+      "outputKey": "visualization_output",
+      "classification": "node",
+      "inputTypes": ["VisualizarMotorInput"],
+      "outputTypes": ["Voxels"]
     }
   ],
-  "outputNodes": ["final_assembly"]
+  "outputNodes": ["VisualizarMotor"],
+  "graph": {
+    "edges": [
+      {"from": "CamaraCombustion", "to": "CamposFisicos"},
+      {"from": "CamaraCombustion", "to": "CoolingRegenerativo"},
+      {"from": "CamaraCombustion", "to": "LatticeAdaptativo"},
+      {"from": "CamaraCombustion", "to": "FractalPostProcess"},
+      {"from": "PreBurner", "to": "CamposFisicos"},
+      {"from": "PreBurner", "to": "CoolingRegenerativo"},
+      {"from": "PreBurner", "to": "LatticeAdaptativo"},
+      {"from": "PreBurner", "to": "FractalPostProcess"},
+      {"from": "ManifoldPrincipal", "to": "CamposFisicos"},
+      {"from": "ManifoldPrincipal", "to": "OrganicManifold"},
+      {"from": "ManifoldPrincipal", "to": "FractalPostProcess"},
+      {"from": "Turbobomba", "to": "CamposFisicos"},
+      {"from": "Turbobomba", "to": "FractalPostProcess"},
+      {"from": "CamposFisicos", "to": "CoolingRegenerativo"},
+      {"from": "CamposFisicos", "to": "LatticeAdaptativo"},
+      {"from": "CamposFisicos", "to": "FractalPostProcess"},
+      {"from": "CoolingRegenerativo", "to": "FractalPostProcess"},
+      {"from": "LatticeAdaptativo", "to": "FractalPostProcess"},
+      {"from": "OrganicManifold", "to": "FractalPostProcess"},
+      {"from": "FractalPostProcess", "to": "AssemblyFFSC"},
+      {"from": "AssemblyFFSC", "to": "VisualizarMotor"}
+    ]
+  }
 }
