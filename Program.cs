@@ -22,7 +22,7 @@ using FFSC_PicoGK.Pipeline;
 
 Library.Go(0.5f, () =>
 {
-    string pipelinePath = "Pipeline/pipeline.json";
+    string pipelinePath = "Pipeline/pipeline_noyron.json";
 
     var registry = new TaskRegistry();
     PipelineBuilder.RegisterAllTasks(registry);
@@ -30,7 +30,7 @@ Library.Go(0.5f, () =>
     Graph graph = PipelineBuilder.BuildPipeline(pipelinePath, registry);
 
     var scheduler = new Scheduler(registry);
-    Voxels? engine = scheduler.ExecuteAndGetResult<Voxels>(graph, "final_assembly");
+    Voxels? engine = scheduler.ExecuteAndGetResult<Voxels>(graph, "VisualizarMotor");
 
     if (engine != null)
         Library.oViewer().Add(engine);

@@ -1,0 +1,89 @@
+{
+  "name": "FFSC Noyron Generative Engine Pipeline",
+  "description": "Grafo completo de motor FFSC generativo basado en nodos grandes volumétricos con agentes internos, siguiendo arquitectura Noyron/Powder/Leap71",
+  "version": "1.0.0",
+  "configPath": "FFSC-PicoGK/config/engine_params.json",
+  "nodes": [
+    {
+      "id": "CamaraCombustion",
+      "name": "Nodo Cámara de Combustión",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_CamaraCombustion",
+      "dependsOn": [],
+      "input": null,
+      "outputKey": "chamber_voxels"
+    },
+    {
+      "id": "PreBurner",
+      "name": "Nodo PreBurner",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_PreBurner",
+      "dependsOn": [],
+      "input": null,
+      "outputKey": "preburner_voxels"
+    },
+    {
+      "id": "ManifoldPrincipal",
+      "name": "Nodo Manifold Principal",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_ManifoldPrincipal",
+      "dependsOn": [],
+      "input": null,
+      "outputKey": "manifold_voxels"
+    },
+    {
+      "id": "Turbobomba",
+      "name": "Nodo Turbobomba",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_Turbobomba",
+      "dependsOn": [],
+      "input": null,
+      "outputKey": "turbopump_voxels"
+    },
+    {
+      "id": "CamposFisicos",
+      "name": "Nodo Campos Físicos",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_CamposFisicos",
+      "dependsOn": ["CamaraCombustion", "PreBurner", "ManifoldPrincipal", "Turbobomba"],
+      "input": {},
+      "outputKey": "physics_fields"
+    },
+    {
+      "id": "CoolingRegenerativo",
+      "name": "Nodo Cooling Regenerativo",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_CoolingRegenerativo",
+      "dependsOn": ["CamaraCombustion", "PreBurner", "CamposFisicos"],
+      "input": {},
+      "outputKey": "cooling_voxels"
+    },
+    {
+      "id": "LatticeAdaptativo",
+      "name": "Nodo Lattice Adaptativo",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_LatticeAdaptativo",
+      "dependsOn": ["CamaraCombustion", "PreBurner", "CamposFisicos"],
+      "input": {},
+      "outputKey": "lattice_voxels"
+    },
+    {
+      "id": "AssemblyFFSC",
+      "name": "Nodo Assembly FFSC",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_AssemblyFFSC",
+      "dependsOn": [
+        "CamaraCombustion",
+        "PreBurner",
+        "ManifoldPrincipal",
+        "Turbobomba",
+        "CoolingRegenerativo",
+        "LatticeAdaptativo",
+        "CamposFisicos"
+      ],
+      "input": {},
+      "outputKey": "engine_ffsc"
+    },
+    {
+      "id": "VisualizarMotor",
+      "name": "Nodo Visualizar Motor",
+      "taskType": "FFSC_PicoGK.Nodes.Noyron.Nodo_VisualizarMotor",
+      "dependsOn": ["AssemblyFFSC"],
+      "input": {},
+      "outputKey": "visualization_output"
+    }
+  ],
+  "outputNodes": ["VisualizarMotor"]
+}

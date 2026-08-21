@@ -12,6 +12,7 @@ using FFSC_PicoGK.Models;
 using FFSC_PicoGK.Physics.Thermo;
 using FFSC_PicoGK.EngineFFSC.Turbopump;
 using FFSC_PicoGK.Pipeline.Nodes;
+using FFSC_PicoGK.Nodes.Noyron;
 
 namespace FFSC_PicoGK.Pipeline;
 
@@ -78,6 +79,33 @@ public static class PipelineBuilder
                     ctx.Get<Voxels>("physics_cfd")!,
                     ctx.Get<Voxels>("lattice_dual")!,
                     ctx.Get<Voxels>("lattice_quasi")!),
+                "CamaraCombustion" => ctx => Unit.Value,
+                "PreBurner" => ctx => Unit.Value,
+                "ManifoldPrincipal" => ctx => Unit.Value,
+                "Turbobomba" => ctx => Unit.Value,
+                "CamposFisicos" => ctx => new CamposFisicosInput(
+                    ctx.Get<Voxels>("CamaraCombustion")!,
+                    ctx.Get<Voxels>("PreBurner")!,
+                    ctx.Get<Voxels>("ManifoldPrincipal")!,
+                    ctx.Get<Voxels>("Turbobomba")!),
+                "CoolingRegenerativo" => ctx => new CoolingRegenerativoInput(
+                    ctx.Get<Voxels>("CamaraCombustion")!,
+                    ctx.Get<Voxels>("PreBurner")!,
+                    ctx.Get<Voxels>("CamposFisicos")!),
+                "LatticeAdaptativo" => ctx => new LatticeAdaptativoInput(
+                    ctx.Get<Voxels>("CamaraCombustion")!,
+                    ctx.Get<Voxels>("PreBurner")!,
+                    ctx.Get<Voxels>("CamposFisicos")!),
+                "AssemblyFFSC" => ctx => new AssemblyFFSCInput(
+                    ctx.Get<Voxels>("CamaraCombustion")!,
+                    ctx.Get<Voxels>("PreBurner")!,
+                    ctx.Get<Voxels>("ManifoldPrincipal")!,
+                    ctx.Get<Voxels>("Turbobomba")!,
+                    ctx.Get<Voxels>("CoolingRegenerativo")!,
+                    ctx.Get<Voxels>("LatticeAdaptativo")!,
+                    ctx.Get<Voxels>("CamposFisicos")!),
+                "VisualizarMotor" => ctx => new VisualizarMotorInput(
+                    ctx.Get<Voxels>("AssemblyFFSC")!),
                 _ => null
             };
 
@@ -118,5 +146,14 @@ public static class PipelineBuilder
         registry.Register("lattice_dual", new LatticeDualNode());
         registry.Register("lattice_quasi", new LatticeQuasiNode());
         registry.Register("final_assembly", new AssemblyNode());
+        registry.Register("CamaraCombustion", new Nodo_CamaraCombustion());
+        registry.Register("PreBurner", new Nodo_PreBurner());
+        registry.Register("ManifoldPrincipal", new Nodo_ManifoldPrincipal());
+        registry.Register("Turbobomba", new Nodo_Turbobomba());
+        registry.Register("CamposFisicos", new Nodo_CamposFisicos());
+        registry.Register("CoolingRegenerativo", new Nodo_CoolingRegenerativo());
+        registry.Register("LatticeAdaptativo", new Nodo_LatticeAdaptativo());
+        registry.Register("AssemblyFFSC", new Nodo_AssemblyFFSC());
+        registry.Register("VisualizarMotor", new Nodo_VisualizarMotor());
     }
 }
