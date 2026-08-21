@@ -3,8 +3,8 @@
 // Task para lattice adaptativo inteligente v07.
 
 using PicoGK;
-using FFSC_PicoGK.EngineFFSC.Geometry;
-using FFSC_PicoGK.EngineFFSC.Physics;
+using EngineFFSC.Geometry;
+using EngineFFSC.Physics;
 using FFSC_PicoGK.Models;
 using FFSC_PicoGK.Geometry.Chamber;
 using FFSC_PicoGK.Geometry.Aerospike;
@@ -43,6 +43,4 @@ namespace EngineFFSC.Tasks
             });
         }
     }
-}
-
 }

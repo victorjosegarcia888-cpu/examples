@@ -3,7 +3,7 @@
 // Task para generar geometria de turbobomba triple v07.
 
 using PicoGK;
-using FFSC_PicoGK.EngineFFSC.Geometry;
+using EngineFFSC.Geometry;
 using FFSC_PicoGK.Models;
 
 namespace EngineFFSC.Tasks
@@ -20,6 +20,4 @@ namespace EngineFFSC.Tasks
             return Geometry_Turbopump_Triple_v07.Build(p);
         }
     }
-}
-
 }

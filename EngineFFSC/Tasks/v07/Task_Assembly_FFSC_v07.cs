@@ -7,7 +7,7 @@ using FFSC_PicoGK.Models;
 using FFSC_PicoGK.Geometry.Chamber;
 using FFSC_PicoGK.Geometry.Nozzle;
 using FFSC_PicoGK.Geometry.Aerospike;
-using FFSC_PicoGK.EngineFFSC.Geometry;
+using EngineFFSC.Geometry;
 using FFSC_PicoGK.Geometry.Manifolds;
 using FFSC_PicoGK.Geometry.Injectors;
 using FFSC_PicoGK.Geometry.Cooling;

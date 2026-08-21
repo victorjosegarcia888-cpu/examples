@@ -3,7 +3,7 @@
 // Task para generar lattice inteligente v07.
 
 using PicoGK;
-using FFSC_PicoGK.EngineFFSC.Geometry;
+using EngineFFSC.Geometry;
 using FFSC_PicoGK.Models;
 using FFSC_PicoGK.Geometry.Chamber;
 using FFSC_PicoGK.Geometry.Aerospike;
@@ -42,6 +42,4 @@ namespace EngineFFSC.Tasks
             });
         }
     }
-}
-
 }
