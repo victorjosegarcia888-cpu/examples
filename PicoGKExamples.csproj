@@ -16,6 +16,7 @@
     <None Include="config\*.json" />
     <None Include="docs\**\*.md" />
     <None Include="*.sh" />
+    <None Include="Pipeline\*.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +25,7 @@
     <Compile Remove="GeometryII\**\*.cs" />
     <Compile Remove="rocket\**\*.cs" />
     <Compile Remove="analysis\**\*.cs" />
+    <Compile Remove="ShapeKernel\**\*.cs" />
     <None Include="FFSC-PicoGK\**\*.json" />
     <None Include="FFSC-PicoGK\**\*.md" />
     <None Include="FFSC-PicoGK\**\*.sh" />

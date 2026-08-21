@@ -1,0 +1,236 @@
+{
+  "name": "FFSC Advanced Pipeline",
+  "description": "Full-flow staged combustion rocket engine design pipeline with 7 phases",
+  "configPath": "config/engine_params.json",
+  "nodes": [
+    {
+      "id": "load_params",
+      "name": "Load Engine Parameters",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.LoadParamsNode",
+      "dependsOn": [],
+      "input": {
+        "configPath": "config/engine_params.json"
+      },
+      "outputKey": "engine_params",
+      "isEntryPoint": true
+    },
+    {
+      "id": "thermo",
+      "name": "Thermodynamic Analysis",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.ThermoNode",
+      "dependsOn": ["load_params"],
+      "input": {
+        "params": { "$ref": "load_params" }
+      },
+      "outputKey": "thermo_map"
+    },
+    {
+      "id": "thickness",
+      "name": "Structural Thickness Calculation",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.ThicknessNode",
+      "dependsOn": ["load_params", "thermo"],
+      "input": {
+        "params": { "$ref": "load_params" },
+        "thermo": { "$ref": "thermo" }
+      },
+      "outputKey": "thickness_map"
+    },
+    {
+      "id": "cooling_analysis",
+      "name": "Cooling Heat Transfer Analysis",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.CoolingAnalysisNode",
+      "dependsOn": ["load_params", "thermo"],
+      "input": {
+        "params": { "$ref": "load_params" },
+        "thermo": { "$ref": "thermo" }
+      },
+      "outputKey": "cooling_map"
+    },
+    {
+      "id": "turbopump_design",
+      "name": "Turbopump Design",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.TurbopumpDesignNode",
+      "dependsOn": ["load_params"],
+      "input": {
+        "params": { "$ref": "load_params" },
+        "massFlowOxidizer": 320.0
+      },
+      "outputKey": "turbopump_design"
+    },
+    {
+      "id": "geom_chamber",
+      "name": "Chamber Geometry",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryChamberNode",
+      "dependsOn": ["load_params"],
+      "input": {
+        "params": { "$ref": "load_params" }
+      },
+      "outputKey": "geom_chamber"
+    },
+    {
+      "id": "geom_nozzle",
+      "name": "Nozzle Geometry",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryNozzleNode",
+      "dependsOn": ["load_params"],
+      "input": {
+        "params": { "$ref": "load_params" }
+      },
+      "outputKey": "geom_nozzle"
+    },
+    {
+      "id": "geom_aerospike",
+      "name": "Aerospike Geometry",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryAerospikeNode",
+      "dependsOn": [],
+      "input": {
+        "length": 0.55,
+        "baseRadius": 0.15
+      },
+      "outputKey": "geom_aerospike"
+    },
+    {
+      "id": "geom_manifold_ffsc",
+      "name": "FFSC Manifold Geometry",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryManifoldFFSCNode",
+      "dependsOn": [],
+      "input": {},
+      "outputKey": "geom_manifold_ffsc"
+    },
+    {
+      "id": "geom_manifold_lox",
+      "name": "LOX Manifold Geometry",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryManifoldLOXNode",
+      "dependsOn": [],
+      "input": {},
+      "outputKey": "geom_manifold_lox"
+    },
+    {
+      "id": "geom_manifold_ch4",
+      "name": "CH4 Manifold Geometry",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryManifoldCH4Node",
+      "dependsOn": [],
+      "input": {},
+      "outputKey": "geom_manifold_ch4"
+    },
+    {
+      "id": "geom_injectors",
+      "name": "Injectors Geometry",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryInjectorsNode",
+      "dependsOn": ["load_params"],
+      "input": {
+        "params": { "$ref": "load_params" }
+      },
+      "outputKey": "geom_injectors"
+    },
+    {
+      "id": "geom_turbopump",
+      "name": "Turbopump Geometry",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryTurbopumpNode",
+      "dependsOn": ["load_params"],
+      "input": {
+        "params": { "$ref": "load_params" }
+      },
+      "outputKey": "geom_turbopump"
+    },
+    {
+      "id": "geom_cooling",
+      "name": "Cooling Channels Geometry",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryCoolingNode",
+      "dependsOn": ["geom_chamber", "geom_aerospike"],
+      "input": {
+        "chamber": { "$ref": "geom_chamber" },
+        "spike": { "$ref": "geom_aerospike" }
+      },
+      "outputKey": "geom_cooling"
+    },
+    {
+      "id": "geom_pipes",
+      "name": "Feed System Pipes",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryPipesNode",
+      "dependsOn": [],
+      "input": {},
+      "outputKey": "geom_pipes"
+    },
+    {
+      "id": "geom_structural",
+      "name": "Structural Frame",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometryStructuralNode",
+      "dependsOn": [],
+      "input": {},
+      "outputKey": "geom_structural"
+    },
+    {
+      "id": "geom_supports",
+      "name": "Engine Supports",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.GeometrySupportsNode",
+      "dependsOn": [],
+      "input": {},
+      "outputKey": "geom_supports"
+    },
+    {
+      "id": "physics_stress",
+      "name": "Stress Field Analysis",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.StressFieldNode",
+      "dependsOn": ["geom_chamber", "geom_aerospike", "geom_manifold_ffsc"],
+      "input": {
+        "chamber": { "$ref": "geom_chamber" },
+        "spike": { "$ref": "geom_aerospike" },
+        "manifold": { "$ref": "geom_manifold_ffsc" }
+      },
+      "outputKey": "physics_stress"
+    },
+    {
+      "id": "physics_cfd",
+      "name": "CFD Thermal Analysis",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.CFDNode",
+      "dependsOn": ["geom_chamber", "geom_nozzle", "geom_aerospike", "geom_manifold_ffsc"],
+      "input": {
+        "chamber": { "$ref": "geom_chamber" },
+        "nozzle": { "$ref": "geom_nozzle" },
+        "spike": { "$ref": "geom_aerospike" },
+        "manifold": { "$ref": "geom_manifold_ffsc" }
+      },
+      "outputKey": "physics_cfd"
+    },
+    {
+      "id": "lattice_dual",
+      "name": "Dual-Layer Lattice",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.LatticeDualNode",
+      "dependsOn": ["physics_stress", "load_params"],
+      "input": {
+        "stressField": { "$ref": "physics_stress" },
+        "highThreshold": 0.6,
+        "lowThreshold": 0.3,
+        "highRadius": 0.015,
+        "lowRadius": 0.008
+      },
+      "outputKey": "lattice_dual"
+    },
+    {
+      "id": "lattice_quasi",
+      "name": "Quasicrystal Lattice",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.LatticeQuasiNode",
+      "dependsOn": ["physics_stress"],
+      "input": {
+        "stressField": { "$ref": "physics_stress" },
+        "scale": 0.3,
+        "intensity": 0.5
+      },
+      "outputKey": "lattice_quasi"
+    },
+    {
+      "id": "final_assembly",
+      "name": "Final Engine Assembly",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.AssemblyNode",
+      "dependsOn": [
+        "geom_chamber", "geom_nozzle", "geom_aerospike",
+        "geom_manifold_ffsc", "geom_manifold_lox", "geom_manifold_ch4",
+        "geom_injectors", "geom_turbopump", "geom_cooling",
+        "geom_pipes", "geom_structural", "geom_supports",
+        "physics_stress", "physics_cfd", "lattice_dual", "lattice_quasi"
+      ],
+      "isFinalOutput": true
+    }
+  ],
+  "outputNodes": ["final_assembly"]
+}

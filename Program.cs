@@ -17,12 +17,21 @@
 //
 
 using PicoGK;
-using FFSC_PicoGK.EngineFFSC;
+using PipelineCore;
+using FFSC_PicoGK.Pipeline;
 
-// This simple call runs PicoGK with the specified task and shows the PicoGK viewer
+Library.Go(0.5f, () =>
+{
+    string pipelinePath = "Pipeline/pipeline.json";
 
-Library.Go(0.5f, FFSCShowcase_Advanced.Task);
-                    // size of each voxel in millimeters
-                   // the task you want to execute
+    var registry = new TaskRegistry();
+    PipelineBuilder.RegisterAllTasks(registry);
 
-// After you close the viewer, the application exits.
+    Graph graph = PipelineBuilder.BuildPipeline(pipelinePath, registry);
+
+    var scheduler = new Scheduler(registry);
+    Voxels? engine = scheduler.ExecuteAndGetResult<Voxels>(graph, "final_assembly");
+
+    if (engine != null)
+        Library.oViewer().Add(engine);
+});

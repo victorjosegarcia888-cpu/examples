@@ -1,145 +1,109 @@
-# Getting started with PicoGK
+# FFSC Rocket Engine - Modular Pipeline Architecture
 
-PicoGK ("peacock") is a compact and robust geometry kernel for Computational Engineering.
+A full-flow staged combustion (FFSC) rocket engine design system built on PicoGK with a modular, graph-based execution pipeline.
 
-You can find general information on [PicoGK.org](https://picogk.org) and the the [PicoGK repository on GitHub](https://leap71.com/PicoGK).
+## Architecture
 
-This repository contains example code, which showcases various aspects of PicoGK.
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Pipeline Execution Graph                  │
+│  ┌──────────┐    ┌──────────┐    ┌──────────────────────┐  │
+│  │ load_    │───▶│ thermo   │───▶│ thickness, cooling_  │  │
+│  │ params   │    │          │    │ analysis              │  │
+│  └────┬─────┘    └────┬─────┘    └──────────────────────┘  │
+│       │               │                                     │
+│       ▼               ▼                                     ▼
+│  ┌──────────┐    ┌──────────┐    ┌──────────────────────┐  │
+│  │ turbopump│    │ geometry │    │ physics_stress,       │  │
+│  │ _design  │    │ nodes    │    │ physics_cfd           │  │
+│  └──────────┘    └────┬─────┘    └──────────┬───────────┘  │
+│                       │                     │               │
+│                       ▼                     ▼               │
+│                ┌──────────────┐    ┌──────────────────┐    │
+│                │ lattice_dual │    │ lattice_quasi    │    │
+│                │ lattice_quasi│    └────────┬─────────┘    │
+│                └──────┬──────┘             │               │
+│                       └───────────┬───────┘               │
+│                                   ▼                         │
+│                        ┌──────────────────┐                 │
+│                        │ final_assembly   │                 │
+│                        └──────────────────┘                 │
+└─────────────────────────────────────────────────────────────┘
+```
 
-You can download this repository's source code to get an instant PicoGK-ready environment to play around with.
+## Modules
 
-For more information, see the [PicoGK documentation on PicoGK.org](https://picogk.org/doc/)
+| Module | Purpose | NuGet |
+|--------|---------|-------|
+| PipelineCore | ITask, Graph, Scheduler, Registry | `PipelineCore` |
+| EngineSpec | Engine parameters, materials, calculators | `FFSC.EngineSpec` |
+| Geometry | Chamber, nozzle, manifolds, injectors, etc. | `FFSC.Geometry` |
+| Physics | Thermo, stress, CFD, cooling, thickness | `FFSC.Physics` |
+| Turbopump | Centrifugal pump design | `FFSC.Turbopump` |
+| Assembly | Modular engine assembly | `FFSC.Assembly` |
+| Viewer | PicoGK runtime viewer integration | `FFSC.Viewer` |
 
-# Topics
-1. ComputeThermoTask → Tad, Tg(z), Bartz hg(z), Qnorm(z)  
-2. ComputeThicknessTask → espesor estructural t(z)  
-3. TurbopumpDesignTask → r1, r2, h, U2, Cu2, ω  
-4. GenerateLatticeTask → Gyroid ↔ Quasicrystal  
-5. Task_AssemblyFFSC_Adaptive → ensamblado final  
-6. FFSCShowcase.Task_VisualizarMotorAdaptive → visor PicoGK  
+## Quick Start
 
----
+```bash
+dotnet build
+dotnet run
+```
 
-# Tests/vscode
- FFSC-PicoGK/
-    EngineFFSC/
-      EngineModel.cs
-      EngineFactory.cs
-      V03_MultiObjective.cs
-      V04_Redundant.cs
-      V05_Adaptive.cs
-  
-    Geometry/
-      Shapes_ChamberSpike.cs
-      Shapes_ManifoldValves.cs
-      Shapes_ManifoldFFSC.cs
-      Shapes_PreBurner.cs
-      Shapes_Turbopump.cs
-      Shapes_Turbine.cs
-      Shapes_MainInjectors.cs
-      Shapes_FaldaModular.cs
-      Shapes_PipesFFSC.cs
-      CoolingChannels.cs
-      CoolingChannels_Manifold.cs
-      Lattice_DualLayer.cs
-      Lattice_Quasicrystal.cs
-      GeometryEngine.cs
-  
-    Physics/
-      StressField.cs
-      ThermalField.cs
-      MassProperties.cs
-      CFD.cs
- 
-    Tasks/
-      Task_GenerateViews.cs
-      Task_ThermalComparison.cs
-      Task_RedundancyDiagram.cs
-      Task_PhysicsReport.cs
-      Task_ExplodedView.cs
-      Task_AssemblyFFSC.cs
+This executes the declarative pipeline defined in `Pipeline/pipeline.json` and displays the engine in the PicoGK viewer.
 
-    PicoGKBridge/
-      Mesher.cs
-      VdbExporter.cs
-      ObjExporter.cs
-      Program.cs
+## Running Tests
 
-# PicoGK
+```bash
+dotnet run --project FFSC-PicoGK/FFSC_PicoGK.TestRunner/FFSC_PicoGK.TestRunner.csproj
+```
 
-Download this example repository, open in VisualStudio Code, and run the code `Program.cs`.
-1. **ComputeThermoTask**  
-   Calcula Tad, Tg(z), Bartz hg(z), Qnorm(z).
+## Pipeline Definition
 
-2. **ComputeThicknessTask**  
-   Calcula espesor estructural t(z) con Barlow + margen térmico.
+The pipeline is defined declaratively in `Pipeline/pipeline.json`:
 
-3. **TurbopumpDesignTask**  
-   Calcula r1, r2, h, U2, Cu2, ω.
+```json
+{
+  "name": "FFSC Advanced Pipeline",
+  "nodes": [
+    {
+      "id": "load_params",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.LoadParamsNode",
+      "dependsOn": [],
+      "input": { "configPath": "config/engine_params.json" },
+      "outputKey": "engine_params"
+    },
+    {
+      "id": "thermo",
+      "taskType": "FFSC_PicoGK.Pipeline.Nodes.ThermoNode",
+      "dependsOn": ["load_params"],
+      "input": { "params": { "$ref": "load_params" } },
+      "outputKey": "thermo_map"
+    }
+    // ... additional nodes
+  ],
+  "outputNodes": ["final_assembly"]
+}
+```
 
-4. **GenerateLatticeTask**  
-   Genera lattice adaptativo:
-   - Gyroid (zonas frías)
-   - Cuasicristal (zonas calientes)
-   - Interpolación exponencial
+## Key Features
 
-5. **Task_AssemblyFFSC_Adaptive**  
-   Ensambla:
-   - Geometría base
-   - Lattice
-   - Cooling
-   - Campos físicos
+- **Modular**: Each engine subsystem is an independent ITask node
+- **Typed**: All inputs/outputs are strictly typed with C# generics
+- **Declarative**: Pipeline structure defined in JSON
+- **Deterministic**: Pure functions, no side effects, reproducible
+- **Scalable**: Easy to add new nodes or modify dependencies
+- **Testable**: Each node can be tested independently
 
-6. **FFSCShowcase.Task_VisualizarMotorAdaptive**  
-   Devuelve un `Field3D` para el visor PicoGK.
+## Documentation
 
----
+- `docs/ARCHITECTURE.md` - System architecture
+- `docs/PIPELINE.md` - Pipeline execution details
+- `docs/MODULES.md` - Module descriptions
+- `docs/GRAPH.md` - Graph dependencies and data flow
 
-## csharp tasks
+## Requirements
 
-```csharp
-Library.Go(0.5f, FFSCShowcase.Task_VisualizarMotorAdaptive);
-
-The examples are organized into subfolders, according to the their category.
-
-## examples
-  FFSC-PicoGK/
-    EngineFFSC/
-    Geometry/
-    Physics/
-    Tasks/
-    PicoGKBridge/
-    Program.cs
-    README.md
-# Motor FFSC — PicoGK + LEAP71
-
-## Turbopumps tests
-
-Este repositorio contiene un motor de cohete **Full‑Flow Staged Combustion (FFSC)** modelado con:
-
-- **PicoGK** (geometría volumétrica)
-- **Tasks C#** (pipeline de diseño)
-- **LEAP71‑style pipeline** (tubería completa)
-- **Turbobomba paramétrica estilo Raptor**
-- **Lattice adaptativo TPMS ↔ cuasicristal**
-- **Cooling regenerativo adaptativo**
-- **Termoquímica + Bartz + espesor estructural**
-
----
-
-## 📁 Estructura del repositorio
-
-EngineFFSC/ 
-Geometría/ 
-Física/ 
-TareasModelos/ 
-Utilidades/
-FFSC-PicoGK/ 
-MotorFFSC/ 
-Geometría/ 
-Física/ 
-Tareas/ 
-Turbobomba/ 
-Modelos/ 
-Utilidades/
-
+- .NET 9.0 SDK
+- PicoGK 1.7.7.4
+- LEAP71 ShapeKernel (optional, for advanced geometry)
