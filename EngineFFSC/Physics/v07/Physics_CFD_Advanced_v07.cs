@@ -22,7 +22,7 @@ namespace EngineFFSC.Physics
 
     public class CFDMap
     {
-        public CFDPoint[] Points;
+        public required CFDPoint[] Points;
     }
 
     public static class Physics_CFD_Advanced_v07

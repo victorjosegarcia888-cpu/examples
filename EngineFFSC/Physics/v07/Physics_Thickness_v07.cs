@@ -20,7 +20,7 @@ namespace EngineFFSC.Physics
 
     public class ThicknessMap
     {
-        public ThicknessPoint[] Points;
+        public required ThicknessPoint[] Points;
     }
 
     public static class Physics_Thickness_v07

@@ -21,7 +21,7 @@ namespace EngineFFSC.Physics
 
     public class StressMap
     {
-        public StressPoint[] Points;
+        public required StressPoint[] Points;
     }
 
     public static class Physics_Stress_Dynamic_v07

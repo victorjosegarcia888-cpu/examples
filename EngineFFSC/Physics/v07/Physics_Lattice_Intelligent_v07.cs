@@ -21,7 +21,7 @@ namespace EngineFFSC.Physics
 
     public class LatticeMap
     {
-        public LatticePoint[] Points;
+        public required LatticePoint[] Points;
     }
 
     public static class Physics_Lattice_Intelligent_v07

@@ -21,7 +21,7 @@ namespace EngineFFSC.Physics
 
     public class ThermoMap
     {
-        public ThermoPoint[] Points;
+        public required ThermoPoint[] Points;
     }
 
     public static class Physics_Thermo_v07

@@ -21,7 +21,7 @@ namespace EngineFFSC.Physics
 
     public class CoolingMap
     {
-        public CoolingPoint[] Points;
+        public required CoolingPoint[] Points;
     }
 
     public static class Physics_Cooling_Active_v07
