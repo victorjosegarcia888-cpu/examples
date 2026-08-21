@@ -1,0 +1,23 @@
+{
+  "PumpType": "Centrifugal_LOX",
+  "MassFlow_kg_s": 320.0,
+  "Head_Pa": 30000000.0,
+  "Density_kg_m3": 1141.0,
+  "InletPressure_bar": 2.0,
+  "OutletPressure_bar": 350.0,
+  "RPM": 40000.0,
+  "RotorInletRadius": 0.03,
+  "RotorOutletRadius": 0.06,
+  "BladeInletAngle_deg": 25.0,
+  "BladeOutletAngle_deg": 30.0,
+  "BladeCount": 10,
+  "BladeChord": 0.04,
+  "BladeHeight": 0.06,
+  "ShroudThickness": 0.008,
+  "VoluteType": "Spiral",
+  "VoluteWidth": 0.06,
+  "DiffuserAngle_deg": 8.0,
+  "ShaftDiameter": 0.06,
+  "BearingType": "AngularContact",
+  "SealType": "Labyrinth"
+}

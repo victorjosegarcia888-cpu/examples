@@ -1,0 +1,17 @@
+{
+  "LatticeType": "DualLayer",
+  "StressThresholdHigh": 0.6,
+  "StressThresholdLow": 0.3,
+  "NodeRadiusHigh": 0.015,
+  "NodeRadiusLow": 0.008,
+  "QuasicrystalScale": 0.3,
+  "QuasicrystalIntensity": 0.5,
+  "GyroidScale": 0.02,
+  "GyroidThickness": 0.005,
+  "ExponentialDecayK": 5.0,
+  "TPMS_Type": "Gyroid",
+  "TPMS_Thickness": 0.004,
+  "MinRelativeDensity": 0.15,
+  "MaxRelativeDensity": 0.40,
+  "VoxelSize": 0.0005
+}

@@ -1,0 +1,94 @@
+{
+  "Chamber": {
+    "Radius": 0.35,
+    "Length": 0.50,
+    "ThroatRadius": 0.12,
+    "ExitRadius": 0.80,
+    "ExpansionRatio": 45.0,
+    "Lstar": 1.2,
+    "ContractionRatio": 6.0,
+    "ProfileType": "SphericalCylindrical"
+  },
+  "Nozzle": {
+    "ThroatRadius": 0.12,
+    "ExitRadius": 0.80,
+    "Length": 0.60,
+    "ExitAngle_deg": 14.0,
+    "ProfileType": "RaoParabolic"
+  },
+  "Aerospike": {
+    "BaseRadius": 0.15,
+    "SpikeLength": 0.55,
+    "SpikeTipRadius": 0.02,
+    "TruncationRatio": 0.85
+  },
+  "Manifold_LOX": {
+    "Radius": 0.18,
+    "Length": 0.32,
+    "WallThickness": 0.012,
+    "YBranchAngle_deg": 30.0,
+    "ToroidalCollectorRadius": 0.15
+  },
+  "Manifold_CH4": {
+    "Radius": 0.18,
+    "Length": 0.32,
+    "WallThickness": 0.012,
+    "SpiralPitch": 0.025,
+    "RadialDistributorCount": 4
+  },
+  "Manifold_FFSC": {
+    "Radius": 0.20,
+    "Length": 0.40,
+    "WallThickness": 0.012,
+    "BranchCount": 6,
+    "PreburnerLineRadius": 0.05,
+    "ReturnLineRadius": 0.04
+  },
+  "Injectors": {
+    "Count": 32,
+    "LoxPostRadius": 0.008,
+    "Ch4AnnulusWidth": 0.004,
+    "SwirlAngle_deg": 45.0,
+    "InjectionAngle_deg": 30.0,
+    "PlateRadius": 0.24,
+    "PlateThickness": 0.02
+  },
+  "Turbopump": {
+    "RotorRadius": 0.16,
+    "HubRadius": 0.05,
+    "BladeCount": 10,
+    "BladeChord": 0.04,
+    "BladeHeight": 0.06,
+    "VoluteRadius": 0.18,
+    "VoluteWidth": 0.06,
+    "ShaftRadius": 0.03,
+    "ShaftLength": 0.30
+  },
+  "Cooling": {
+    "ChannelWidth": 0.006,
+    "ChannelHeight": 0.0015,
+    "ChannelCount": 120,
+    "ChannelPitch": 0.02,
+    "InletTemp_C": 20.0,
+    "Pressure_bar": 450.0,
+    "MassFlow_kg_s": 50.0
+  },
+  "Structural": {
+    "ThrustFrameWidth": 0.08,
+    "GimbalMountRadius": 0.10,
+    "SkirtHeight": 0.20,
+    "SkirtRadius": 0.40
+  },
+  "Pipes": {
+    "LoxRadius": 0.03,
+    "Ch4Radius": 0.03,
+    "MainPipeLength": 0.80,
+    "BranchLength": 0.60
+  },
+  "Supports": {
+    "StrutCount": 4,
+    "StrutRadius": 0.03,
+    "StrutLength": 0.40,
+    "BasePlateRadius": 0.50
+  }
+}
