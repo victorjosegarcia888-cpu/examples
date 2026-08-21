@@ -24,9 +24,6 @@ namespace FFSC_PicoGK.Geometry.Chamber
             float Rt = (float)p.ThroatRadius;
             float Lstar = (float)p.Lstar;
             float CR = (float)p.ContractionRatio;
-            float voxSize = 0.5f;
-
-            // Camara como conjunto de esferas apiladas
             Voxels chamber = Voxels.voxSphere(new Vector3(0, 0, Lc * 0.5f), Rc);
             chamber += Voxels.voxSphere(new Vector3(0, 0, Lc * 0.75f), Rc);
             chamber += Voxels.voxSphere(new Vector3(0, 0, Lc), Rc);

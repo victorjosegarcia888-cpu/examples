@@ -219,6 +219,19 @@
       "outputKey": "lattice_quasi"
     },
     {
+      "id": "geometryii_shape",
+      "name": "GeometryII Shape Generator",
+      "taskType": "GeometryII.Tasks.GeometryII_ShapeGeneratorTask",
+      "dependsOn": [],
+      "input": {
+        "radius": 0.1,
+        "height": 0.2,
+        "segments": 32,
+        "shapeType": "sphere"
+      },
+      "outputKey": "geometryii_shape"
+    },
+    {
       "id": "final_assembly",
       "name": "Final Engine Assembly",
       "taskType": "FFSC_PicoGK.Pipeline.Nodes.AssemblyNode",

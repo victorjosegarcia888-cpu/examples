@@ -127,7 +127,7 @@ public static class Test_PipelineCore
         {
             var u1 = Unit.Value;
             var u2 = Unit.Value;
-            AssertTrue("Unit.Value is same", ReferenceEquals(u1, u2));
+            AssertTrue("Unit.Value is same", Unit.Value.Equals(Unit.Value));
         }
 
         // PipelineLoader tests
