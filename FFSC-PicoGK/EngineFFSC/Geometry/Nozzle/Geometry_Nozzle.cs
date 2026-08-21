@@ -17,7 +17,6 @@ namespace FFSC_PicoGK.Geometry.Nozzle
             float Re = (float)p.ExitRadius;
             float Lstar = (float)p.Lstar;
             float Lnozzle = Lstar * 0.6f;
-            float voxSize = 0.5f;
 
             Voxels nozzle = Voxels.voxSphere(new Vector3(0, 0, 0), Rt);
 

@@ -65,7 +65,7 @@ namespace FFSC_PicoGK.Utils
             {
                 p.Material = new MaterialSpec
                 {
-                    Name = mat.GetProperty("Name").GetString(),
+                    Name = mat.GetProperty("Name").GetString() ?? string.Empty,
                     YieldStrengthPa = mat.GetProperty("YieldStrengthPa").GetDouble(),
                     Density = mat.GetProperty("Density").GetDouble(),
                     ThermalConductivity = mat.GetProperty("ThermalConductivity").GetDouble(),

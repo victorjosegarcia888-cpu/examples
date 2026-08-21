@@ -10,7 +10,7 @@ namespace FFSC_PicoGK.Geometry.Cooling
 {
     public static class Geometry_Cooling
     {
-        public static Voxels Primary(Voxels chamber, Voxels spike,
+        public static Voxels Primary(Voxels? chamber, Voxels? spike,
             double channelRadius = 0.006, double pitch = 0.02)
         {
             float r = (float)channelRadius;

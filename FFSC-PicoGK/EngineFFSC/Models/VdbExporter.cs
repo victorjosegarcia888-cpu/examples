@@ -11,7 +11,7 @@ namespace FFSC_PicoGK.Models
     {
         public static void Export(Voxels geom, string ruta)
         {
-            string dir = Path.GetDirectoryName(ruta);
+            string? dir = Path.GetDirectoryName(ruta);
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
