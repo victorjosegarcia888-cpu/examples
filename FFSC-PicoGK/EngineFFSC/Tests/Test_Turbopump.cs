@@ -19,7 +19,7 @@ namespace FFSC_PicoGK.EngineFFSC.Tests
                 TurbopumpRPM = 40000.0
             };
 
-            var design = TurbopumpDesigner.Run(p, p.MassFlowOxidizer);
+            TurbopumpDesign design = TurbopumpDesigner.Run(p, p.MassFlowOxidizer);
 
             passed &= design != null;
             passed &= design.MassFlow > 0.0;

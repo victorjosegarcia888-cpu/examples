@@ -1,55 +1,39 @@
 // FFSCShowcase_Advanced.cs
 //
 // Punto de entrada avanzado para visualizar el motor FFSC.
-//
-// Permite visualizar:
-// - Todos los subsistemas independientemente
-// - Motor completo (version seleccionable)
-// - Vista explotada
-// - Campos fisicos
+// La tarea retorna void y agrega el motor directamente al viewer.
 
 using PicoGK;
 using FFSC_PicoGK.EngineFFSC.Assembly;
 using FFSC_PicoGK.EngineFFSC.Versions;
 using FFSC_PicoGK.Pipeline;
+using FFSC_PicoGK.Models;
 
 namespace FFSC_PicoGK.EngineFFSC
 {
-    /// <summary>
-    /// Showcase avanzado del motor FFSC.
-    /// </summary>
     public static class FFSCShowcase_Advanced
     {
-        /// <summary>
-        /// Visualiza el motor completo version v06.
-        /// </summary>
-        public static Field3D Task()
+        public static void Task()
         {
-            return FFSC_v06.Build();
+            Voxels engine = FFSC_v06.Build();
+            Library.oViewer().Add(engine);
         }
 
-        /// <summary>
-        /// Visualiza una version especifica.
-        /// </summary>
-        public static Field3D Task(string version)
+        public static void Task(string version)
         {
-            return version.ToLower() switch
+            Voxels engine = version.ToLower() switch
             {
                 "v03" => FFSC_v03.Build(),
                 "v04" => FFSC_v04.Build(),
                 "v05" => FFSC_v05.Build(),
                 "v06" or _ => FFSC_v06.Build()
             };
+            Library.oViewer().Add(engine);
         }
 
-        /// <summary>
-        /// Visualiza subsistema especifico.
-        /// </summary>
-        public static Field3D Task_Subsystem(string subsystem)
+        public static void Task_Subsystem(string subsystem)
         {
             var config = new FFSC_Assembly_Config();
-
-            // Reset all
             config.IncludeChamber = false;
             config.IncludeNozzle = false;
             config.IncludeAerospike = false;
@@ -75,13 +59,11 @@ namespace FFSC_PicoGK.EngineFFSC
                 case "supports": config.IncludeSupports = true; break;
             }
 
-            return FFSC_Assembly_Modular.Assemble(config);
+            Voxels engine = FFSC_Assembly_Modular.Assemble(config);
+            Library.oViewer().Add(engine);
         }
 
-        /// <summary>
-        /// Visualiza el motor via pipeline completo.
-        /// </summary>
-        public static Field3D Task_Pipeline()
+        public static void Task_Pipeline()
         {
             EngineParams p = new EngineParams
             {
@@ -102,7 +84,8 @@ namespace FFSC_PicoGK.EngineFFSC
                 YieldStrengthPa = 1.03e9
             };
 
-            return FFSC_Pipeline_Advanced.Execute(p);
+            Voxels engine = FFSC_Pipeline_Advanced.Execute(p);
+            Library.oViewer().Add(engine);
         }
     }
 }

@@ -3,19 +3,13 @@
 // Task para calculo de espesor estructural.
 
 using FFSC_PicoGK.Models;
-using FFSC_PicoGK.Physics.Structural;
 using FFSC_PicoGK.Physics.Thermo;
+using FFSC_PicoGK.Physics.Structural;
 
 namespace FFSC_PicoGK.Tasks.Physics
 {
-    /// <summary>
-    /// Task de espesor estructural.
-    /// </summary>
     public static class Task_Thickness
     {
-        /// <summary>
-        /// Ejecuta el calculo de espesor.
-        /// </summary>
         public static ThicknessMap Task()
         {
             EngineParams p = new EngineParams

@@ -7,14 +7,8 @@ using FFSC_PicoGK.Physics.Thermo;
 
 namespace FFSC_PicoGK.Tasks.Physics
 {
-    /// <summary>
-    /// Task de termoquimica.
-    /// </summary>
     public static class Task_Thermo
     {
-        /// <summary>
-        /// Ejecuta el calculo termoquimico.
-        /// </summary>
         public static ThermoMap Task()
         {
             EngineParams p = new EngineParams

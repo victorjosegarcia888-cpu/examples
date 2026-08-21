@@ -9,15 +9,9 @@ using FFSC_PicoGK.Geometry.Aerospike;
 
 namespace FFSC_PicoGK.Tasks.Geometry
 {
-    /// <summary>
-    /// Task de generacion de canales de refrigeracion.
-    /// </summary>
     public static class Task_Geometry_Cooling
     {
-        /// <summary>
-        /// Genera los canales de refrigeracion.
-        /// </summary>
-        public static Field3D Task()
+        public static Voxels Task()
         {
             var chamber = Geometry_Chamber.Create(
                 new FFSC_PicoGK.Models.EngineParams
@@ -33,8 +27,7 @@ namespace FFSC_PicoGK.Tasks.Geometry
 
             var primary = Geometry_Cooling.Primary(chamber, spike);
             var secondary = Geometry_Cooling.Secondary(chamber, spike);
-
-            return Field3D.Combine(primary, secondary);
+            return primary + secondary;
         }
     }
 }

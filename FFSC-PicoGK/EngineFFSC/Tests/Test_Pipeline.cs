@@ -36,24 +36,19 @@ namespace FFSC_PicoGK.EngineFFSC.Tests
                 YieldStrengthPa = 1.03e9
             };
 
-            // Test pipeline completo
-            Field3D pipelineResult = FFSC_Pipeline_Advanced.Execute(p);
+            Voxels pipelineResult = FFSC_Pipeline_Advanced.Execute(p);
             passed &= pipelineResult != null;
 
-            // Test ensamblado v03
-            Field3D v03 = FFSC_Assembly_Modular.V03();
+            Voxels v03 = FFSC_Assembly_Modular.V03();
             passed &= v03 != null;
 
-            // Test ensamblado v04
-            Field3D v04 = FFSC_Assembly_Modular.V04();
+            Voxels v04 = FFSC_Assembly_Modular.V04();
             passed &= v04 != null;
 
-            // Test ensamblado v05
-            Field3D v05 = FFSC_Assembly_Modular.V05();
+            Voxels v05 = FFSC_Assembly_Modular.V05();
             passed &= v05 != null;
 
-            // Test ensamblado v06
-            Field3D v06 = FFSC_Assembly_Modular.V06();
+            Voxels v06 = FFSC_Assembly_Modular.V06();
             passed &= v06 != null;
 
             return passed;

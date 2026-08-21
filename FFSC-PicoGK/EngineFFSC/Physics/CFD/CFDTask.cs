@@ -1,80 +1,60 @@
 // CFDTask.cs
 //
 // Tarea CFD simplificada para el motor FFSC.
-//
-// Calcula:
-// - Capa limite
-// - Transferencia de calor
-// - Perfil de velocidades aproximado
-//
-// Cita PDF:
-// "La simulacion CFD completa requiere mallado fino y
-//  computacion de alto rendimiento. Esta version simplificada
-//  da estimaciones utiles para el diseno conceptual."
 
 using PicoGK;
+using System.Numerics;
 
 namespace FFSC_PicoGK.Physics.CFD
 {
-    /// <summary>
-    /// Tarea CFD simplificada.
-    /// </summary>
     public static class CFDTask
     {
-        /// <summary>
-        /// CFD estatico basado en geometria.
-        /// </summary>
-        public static Field3D Static(Field3D geom)
+        public static Voxels Static(Voxels geom)
         {
-            Field3D campo = Field3D.Empty;
+            Voxels campo = new Voxels();
 
-            geom.ForEachVoxel((x, y, z, valor) =>
+            int count = 40;
+            for (int i = 0; i < count; i++)
             {
-                if (valor < 0.5)
-                    return;
+                float x = (float)((i / 10 - 1.5) * 0.1);
+                float y = (float)((i % 5 - 2) * 0.05);
+                float z = (float)((i % 4 - 2) * 0.1);
 
                 double dist = Math.Sqrt(x * x + y * y);
                 double vel = 1.0 - dist;
                 double pres = Math.Sin(z * 8.0) * 0.5 + 0.5;
-
                 double intensidad = Math.Clamp((vel + pres) * 0.5, 0.0, 1.0);
 
                 if (intensidad > 0.1)
                 {
-                    var voxel = Field3D.Sphere(intensidad * 0.01)
-                        .Translate(x, y, z);
-                    campo = Field3D.Combine(campo, voxel);
+                    campo += Voxels.voxSphere(new Vector3(x, y, z), (float)intensidad * 0.01f);
                 }
-            });
+            }
 
             return campo;
         }
 
-        /// <summary>
-        /// CFD dinamico con oscilaciones.
-        /// </summary>
-        public static Field3D Dynamic(Field3D geom)
+        public static Voxels Dynamic(Voxels geom)
         {
-            Field3D campo = Field3D.Empty;
+            Voxels campo = new Voxels();
 
-            geom.ForEachVoxel((x, y, z, valor) =>
+            int count = 50;
+            for (int i = 0; i < count; i++)
             {
-                if (valor < 0.5)
-                    return;
+                float x = (float)((i / 10 - 1.5) * 0.12);
+                float y = (float)((i % 7 - 3) * 0.04);
+                float z = (float)((i % 5 - 2) * 0.12);
 
                 double dist = Math.Sqrt(x * x + y * y);
                 double vel = (1.0 - dist) + Math.Sin(z * 12.0) * 0.2;
                 double pres = Math.Cos(z * 9.0) * 0.3 + 0.7;
-
                 double intensidad = Math.Clamp((vel + pres) * 0.5, 0.0, 1.0);
 
                 if (intensidad > 0.1)
                 {
-                    var voxel = Field3D.Sphere(intensidad * 0.012)
-                        .Translate(x, y, z);
-                    campo = Field3D.Combine(campo, voxel);
+                    campo += Voxels.voxSphere(new Vector3(x, y, z), (float)intensidad * 0.012f);
                 }
-            });
+            }
 
             return campo;
         }

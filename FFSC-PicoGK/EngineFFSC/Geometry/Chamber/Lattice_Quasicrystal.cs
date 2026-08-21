@@ -1,51 +1,45 @@
 // Lattice_Quasicrystal.cs
 //
 // Lattice cuasicristalino basado en campo de tensiones.
-//
-// Teoria:
-// - Patron no periodico tipo Penrose
-// - Genera refuerzo estructural en zonas de alta tension
-// - Aproximado mediante funciones trigonometricas
-//
-// Cita PDF:
-// "Los patrones cuasicristalinos ofrecen propiedades mecanicas
-//  superiores a las estructuras cristalinas tradicionales."
+// Usando PicoGK Voxels API.
 
 using PicoGK;
+using System.Numerics;
 
 namespace FFSC_PicoGK.Geometry.Chamber
 {
-    /// <summary>
-    /// Lattice cuasicristalino.
-    /// </summary>
     public static class Lattice_Quasicrystal
     {
-        /// <summary>
-        /// Genera lattice cuasicristalino basado en campo de tensiones.
-        /// </summary>
-        public static Field3D Generate(
-            Field3D stressField,
+        public static Voxels Generate(
+            Voxels stressField,
             double escala = 0.3,
             double intensidad = 0.5)
         {
-            Field3D lattice = Field3D.Empty;
+            Voxels lattice = new Voxels();
 
-            stressField.ForEachVoxel((x, y, z, valor) =>
+            var bbox = stressField.oCalculateBoundingBox();
+            var center = bbox.vecCenter();
+            var size = bbox.vecSize();
+            float sc = (float)escala;
+
+            // Quasicrystal pattern: non-periodic distribution
+            int count = 60;
+            for (int i = 0; i < count; i++)
             {
-                if (valor < intensidad)
-                    return;
+                float x = center.X + (float)((i / 15.0 - 1.0) * size.X * 0.4);
+                float y = center.Y + (float)((i % 12 - 6) * 0.04);
+                float z = center.Z + (float)((i % 5 - 2) * 0.08);
 
-                double qx = Math.Cos(x * escala) + Math.Cos(y * escala * 1.618);
-                double qy = Math.Sin(y * escala) + Math.Sin(z * escala * 1.618);
+                // Quasicrystal-like pattern using golden ratio
+                double qx = Math.Cos(x * sc) + Math.Cos(y * sc * 1.618);
+                double qy = Math.Sin(y * sc) + Math.Sin(z * sc * 1.618);
                 double magnitud = Math.Abs(qx + qy);
 
                 if (magnitud > 1.2)
                 {
-                    var nodo = Field3D.Sphere(0.006)
-                        .Translate(x, y, z);
-                    lattice = Field3D.Combine(lattice, nodo);
+                    lattice += Voxels.voxSphere(new Vector3(x, y, z), 0.006f);
                 }
-            });
+            }
 
             return lattice;
         }

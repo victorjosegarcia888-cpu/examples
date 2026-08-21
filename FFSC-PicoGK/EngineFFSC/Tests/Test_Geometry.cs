@@ -33,46 +33,36 @@ namespace FFSC_PicoGK.EngineFFSC.Tests
                 ContractionRatio = 6.0
             };
 
-            // Test camara
-            Field3D chamber = Geometry_Chamber.Create(p);
+            Voxels chamber = Geometry_Chamber.Create(p);
             passed &= chamber != null;
 
-            // Test tobera
-            Field3D nozzle = Geometry_Nozzle.Create(p);
+            Voxels nozzle = Geometry_Nozzle.Create(p);
             passed &= nozzle != null;
 
-            // Test aerospike
-            Field3D spike = Geometry_Aerospike.Create(p);
+            Voxels spike = Geometry_Aerospike.Create(p);
             passed &= spike != null;
 
-            // Test manifolds
-            Field3D lox = Geometry_Manifold_LOX.Create();
-            Field3D ch4 = Geometry_Manifold_CH4.Create();
-            Field3D ffsc = Geometry_Manifold_FFSC.Create();
+            Voxels lox = Geometry_Manifold_LOX.Create();
+            Voxels ch4 = Geometry_Manifold_CH4.Create();
+            Voxels ffsc = Geometry_Manifold_FFSC.Create();
             passed &= lox != null && ch4 != null && ffsc != null;
 
-            // Test inyectores
-            Field3D injectors = Geometry_Injectors.Create();
+            Voxels injectors = Geometry_Injectors.Create();
             passed &= injectors != null;
 
-            // Test turbobomba
-            Field3D turbopump = Geometry_Turbopump.Create();
+            Voxels turbopump = Geometry_Turbopump.Create();
             passed &= turbopump != null;
 
-            // Test tuberias
-            Field3D pipes = Geometry_Pipes.Create();
+            Voxels pipes = Geometry_Pipes.Create();
             passed &= pipes != null;
 
-            // Test estructural
-            Field3D structural = Geometry_Structural.Create();
+            Voxels structural = Geometry_Structural.Create();
             passed &= structural != null;
 
-            // Test soportes
-            Field3D supports = Geometry_Supports.Create();
+            Voxels supports = Geometry_Supports.Create();
             passed &= supports != null;
 
-            // Test refrigeracion
-            Field3D cooling = Geometry_Cooling.Primary(chamber, spike);
+            Voxels cooling = Geometry_Cooling.Primary(chamber, spike);
             passed &= cooling != null;
 
             return passed;

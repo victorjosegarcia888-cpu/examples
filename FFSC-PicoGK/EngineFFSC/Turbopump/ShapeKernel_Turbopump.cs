@@ -1,17 +1,15 @@
-//
 // ShapeKernel_Turbopump.cs
 //
-// Exportación paramétrica de turbobomba FFSC para ShapeKernel.
-//
+// Exportacion parametrica para ShapeKernel.
 
-using MotorFFSC.Models;
+using FFSC_PicoGK.Models;
 using System.Collections.Generic;
 
-namespace MotorFFSC.Turbopump
+namespace FFSC_PicoGK.EngineFFSC.Turbopump
 {
     public static class ShapeKernel_Turbopump
     {
-        public static Dictionary<string, double> Export(PumpSpec spec)
+        public static Dictionary<string, double> Export(TurbopumpDesign spec)
         {
             return new Dictionary<string, double>
             {

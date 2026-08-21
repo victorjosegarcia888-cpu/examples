@@ -5,6 +5,8 @@
 using PicoGK;
 using FFSC_PicoGK.Physics.Stress;
 using FFSC_PicoGK.Geometry.Chamber;
+using FFSC_PicoGK.Geometry.Aerospike;
+using FFSC_PicoGK.Geometry.Manifolds;
 using FFSC_PicoGK.Models;
 
 namespace FFSC_PicoGK.EngineFFSC.Tests
@@ -31,11 +33,9 @@ namespace FFSC_PicoGK.EngineFFSC.Tests
             var stress = StressField.Static(camara, spike, manifold);
             passed &= stress != null;
 
-            // Test Lattice_DualLayer (referenced from Chamber namespace)
             var lattice = Lattice_DualLayer.Generate(stress, 0.6, 0.3, 0.015, 0.008);
             passed &= lattice != null;
 
-            // Test Lattice_Quasicrystal (referenced from Chamber namespace)
             var quasi = Lattice_Quasicrystal.Generate(stress, 0.3, 0.5);
             passed &= quasi != null;
 

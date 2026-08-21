@@ -5,9 +5,6 @@
 using FFSC_PicoGK.Models;
 using FFSC_PicoGK.Physics.Thermo;
 using FFSC_PicoGK.Physics.Cooling;
-using FFSC_PicoGK.Geometry.Chamber;
-using FFSC_PicoGK.Geometry.Aerospike;
-using FFSC_PicoGK.Geometry.Cooling;
 
 namespace FFSC_PicoGK.EngineFFSC.Tests
 {
@@ -30,14 +27,13 @@ namespace FFSC_PicoGK.EngineFFSC.Tests
                 CoolantOutletTemp_C = 750.0
             };
 
-            var thermo = ComputeThermoTask.Run(p);
-            var coolingMap = CoolingTask.Run(p, thermo);
+            ThermoMap thermo = ComputeThermoTask.Run(p);
+            CoolingMap coolingMap = CoolingTask.Run(p, thermo);
 
             passed &= coolingMap != null;
             passed &= coolingMap.Points != null;
             passed &= coolingMap.Points.Length == p.Nz;
 
-            // Verify Tw is in reasonable range
             foreach (var pt in coolingMap.Points)
             {
                 passed &= pt.Tw > 0.0;

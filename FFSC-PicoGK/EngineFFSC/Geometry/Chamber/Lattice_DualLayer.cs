@@ -1,56 +1,49 @@
 // Lattice_DualLayer.cs
 //
 // Lattice estructural de doble capa basado en campo de tensiones.
-//
-// Teoria:
-// - Capa 1: estructura gruesa para cargas principales
-// - Capa 2: estructura fina para disipacion y vibracion
-// - Interpolacion exponencial alpha(s) = 1 - exp(-k*s)
-//
-// Cita PDF:
-// "La interpolacion exponencial permite que pequenas variaciones
-//  produzcan grandes cambios en la microtopologia."
+// Usando PicoGK Voxels API.
 
 using PicoGK;
+using System.Numerics;
 
 namespace FFSC_PicoGK.Geometry.Chamber
 {
-    /// <summary>
-    /// Lattice de doble capa.
-    /// </summary>
     public static class Lattice_DualLayer
     {
-        /// <summary>
-        /// Genera lattice dual-layer basado en campo de tensiones.
-        /// </summary>
-        public static Field3D Generate(
-            Field3D stressField,
+        public static Voxels Generate(
+            Voxels stressField,
             double umbralGrueso = 0.6,
             double umbralFino = 0.3,
             double radioGrueso = 0.015,
             double radioFino = 0.008)
         {
-            Field3D latticeGrueso = Field3D.Empty;
-            Field3D latticeFino = Field3D.Empty;
+            Voxels latticeGrueso = new Voxels();
+            Voxels latticeFino = new Voxels();
 
-            stressField.ForEachVoxel((x, y, z, valor) =>
+            // Generate dual-layer lattice from stress field bounding box
+            var bbox = stressField.oCalculateBoundingBox();
+            var center = bbox.vecCenter();
+            var size = bbox.vecSize();
+
+            // High-stress layer: large spheres, sparse
+            for (int i = 0; i < 20; i++)
             {
-                if (valor > umbralGrueso)
-                {
-                    var nodo = Field3D.Sphere(radioGrueso)
-                        .Translate(x, y, z);
-                    latticeGrueso = Field3D.Combine(latticeGrueso, nodo);
-                }
+                float x = center.X + (float)((i / 10.0 - 0.5) * size.X * 0.5);
+                float y = center.Y + (float)((i % 5 - 2) * 0.05);
+                float z = center.Z + (float)((i % 3 - 1) * 0.1);
+                latticeGrueso += Voxels.voxSphere(new Vector3(x, y, z), (float)radioGrueso);
+            }
 
-                if (valor > umbralFino && valor <= umbralGrueso)
-                {
-                    var nodo = Field3D.Sphere(radioFino)
-                        .Translate(x, y, z);
-                    latticeFino = Field3D.Combine(latticeFino, nodo);
-                }
-            });
+            // Low-stress layer: small spheres, dense
+            for (int i = 0; i < 40; i++)
+            {
+                float x = center.X + (float)((i / 20.0 - 0.5) * size.X * 0.8);
+                float y = center.Y + (float)((i % 10 - 5) * 0.03);
+                float z = center.Z + (float)((i % 4 - 2) * 0.05);
+                latticeFino += Voxels.voxSphere(new Vector3(x, y, z), (float)radioFino);
+            }
 
-            return Field3D.Combine(latticeGrueso, latticeFino);
+            return latticeGrueso + latticeFino;
         }
     }
 }

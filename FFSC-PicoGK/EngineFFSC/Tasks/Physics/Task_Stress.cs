@@ -11,15 +11,9 @@ using FFSC_PicoGK.Geometry.Aerospike;
 
 namespace FFSC_PicoGK.Tasks.Physics
 {
-    /// <summary>
-    /// Task de campo de tensiones.
-    /// </summary>
     public static class Task_Stress
     {
-        /// <summary>
-        /// Ejecuta la generacion del campo de tensiones.
-        /// </summary>
-        public static Field3D Task()
+        public static Voxels Task()
         {
             var camara = Geometry_Chamber.Create(
                 new FFSC_PicoGK.Models.EngineParams
@@ -43,7 +37,7 @@ namespace FFSC_PicoGK.Tasks.Physics
             var manifold = Geometry_Manifold_FFSC.Create();
             var spike = Geometry_Aerospike.Create(0.55, 0.15);
 
-            return StressField.Dynamic(camara, nozzle, manifold);
+            return StressField.Dynamic(camara, spike, manifold);
         }
     }
 }

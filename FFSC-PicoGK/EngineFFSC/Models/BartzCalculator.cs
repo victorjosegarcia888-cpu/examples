@@ -1,36 +1,12 @@
 // BartzCalculator.cs
 //
-// Implementacion de la ecuacion de Bartz para transferencia de calor
-// en toberas de cohete.
-//
-// Ecuacion:
-// hg = 0.026 * (mu^0.2) * (cp^0.6) * (Pc/C*)^0.8 *
-//      (Dt^0.2) * (Rc^-0.1) * (At/A)^0.9 * Pr^-0.6
-//
-// Donde:
-// - hg: coeficiente de pelicula [W/m^2-K]
-// - mu: viscosidad dinamica del gas [Pa-s]
-// - cp: calor especifico a presion constante [J/kg-K]
-// - Pc: presion de camara [Pa]
-// - C*: velocidad caracteristica [m/s]
-// - Dt: diametro de garganta [m]
-// - Rc: radio de curvatura local [m]
-// - At: area de garganta [m^2]
-// - A: area local [m^2]
-// - Pr: numero de Prandtl [-]
-//
-// Cita del PDF:
-// "El coeficiente de pelicula Bartz predice el flujo de calor
-//  en la pared de la tobera con precision razonable para
-//  regimenes subsónicos y supersónicos."
+// Implementacion de la ecuacion de Bartz para transferencia de calor.
+// Usando PicoGK Voxels API.
 
 using FFSC_PicoGK.Models;
 
 namespace FFSC_PicoGK.Models
 {
-    /// <summary>
-    /// Calculadora de transferencia de calor usando ecuacion de Bartz.
-    /// </summary>
     public static class BartzCalculator
     {
         private const double C_FACTOR = 0.026;
@@ -39,23 +15,14 @@ namespace FFSC_PicoGK.Models
         private const double PR_REF = 0.7;
         private const double CSTAR_REF = 1500.0;
 
-        /// <summary>
-        /// Evalua el coeficiente de pelicula Bartz.
-        /// </summary>
-        /// <param name="p">Parametros del motor</param>
-        /// <param name="Tg">Temperatura del gas [K]</param>
-        /// <param name="Dt_local">Diametro de garganta local [m]</param>
-        /// <param name="A_local">Area de seccion local [m^2]</param>
-        /// <returns>Coeficiente de pelicula hg [W/m^2-K]</returns>
         public static double Evaluate(
             EngineParams p,
             double Tg,
             double Dt_local,
             double A_local)
         {
-            // Propiedades del gas (simplificadas, temperatura-dependientes)
-            double mu = MU_REF * (1.0 + 0.0005 * (Tg - 3000.0)); // viscosidad
-            double cp = CP_REF + 0.1 * (Tg - 3000.0);            // cp
+            double mu = MU_REF * (1.0 + 0.0005 * (Tg - 3000.0));
+            double cp = CP_REF + 0.1 * (Tg - 3000.0);
             double Pr = PR_REF;
 
             double Pc = p.Pc;
@@ -78,9 +45,6 @@ namespace FFSC_PicoGK.Models
             return Math.Max(0.0, hg);
         }
 
-        /// <summary>
-        /// Calcula el flujo de calor de pared Qw = hg * (Tg - Tw).
-        /// </summary>
         public static double HeatFlux(
             EngineParams p,
             double Tg,

@@ -10,15 +10,9 @@ using FFSC_PicoGK.Geometry.Manifolds;
 
 namespace FFSC_PicoGK.Tasks.Physics
 {
-    /// <summary>
-    /// Task de CFD simplificado.
-    /// </summary>
     public static class Task_CFD
     {
-        /// <summary>
-        /// Ejecuta CFD estatico.
-        /// </summary>
-        public static Field3D Task()
+        public static Voxels Task()
         {
             var camara = Geometry_Chamber.Create(
                 new FFSC_PicoGK.Models.EngineParams
@@ -40,9 +34,8 @@ namespace FFSC_PicoGK.Tasks.Physics
                 });
 
             var manifold = Geometry_Manifold_FFSC.Create();
-            var geom = Field3D.Combine(camara, nozzle, manifold);
-
-            return CFDTask.Static(geom);
+            var geom = camara + nozzle + manifold;
+            return CFDTask.Dynamic(geom);
         }
     }
 }

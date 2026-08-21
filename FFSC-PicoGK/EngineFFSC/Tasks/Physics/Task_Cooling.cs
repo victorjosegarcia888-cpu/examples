@@ -8,14 +8,8 @@ using FFSC_PicoGK.Physics.Cooling;
 
 namespace FFSC_PicoGK.Tasks.Physics
 {
-    /// <summary>
-    /// Task de refrigeracion.
-    /// </summary>
     public static class Task_Cooling
     {
-        /// <summary>
-        /// Ejecuta el calculo de refrigeracion.
-        /// </summary>
         public static CoolingMap Task()
         {
             EngineParams p = new EngineParams

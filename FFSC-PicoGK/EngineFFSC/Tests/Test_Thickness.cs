@@ -32,13 +32,12 @@ namespace FFSC_PicoGK.EngineFFSC.Tests
             };
 
             ThermoMap thermo = ComputeThermoTask.Run(p);
-            var thickness = ComputeThicknessTask.Run(p, thermo);
+            ThicknessMap thickness = ComputeThicknessTask.Run(p, thermo);
 
             passed &= thickness != null;
             passed &= thickness.Points != null;
             passed &= thickness.Points.Length == p.Nz;
 
-            // Verificar que espesor > 0
             foreach (var pt in thickness.Points)
             {
                 passed &= pt.Thickness > 0.0;
