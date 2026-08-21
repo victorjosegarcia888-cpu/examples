@@ -1,75 +1,59 @@
 // Geometry_Manifold_LOX.cs
 //
 // Geometria de manifold LOX avanzado.
-//
-// Incluye:
-// - Colector toroidal
-// - Ramas en Y (bifurcacion)
-// - Compensacion de presion
-// - Valvulas redundantes
-//
-// Teoria:
-// - Presion diferencial maxima: 35 MPa (Pc)
-// - Caudal: 320 kg/s LOX
-// - Diametro hidraulico optimizado
-//
-// Cita PDF:
-// "El manifold LOX debe mantener temperatura criogenica
-//  (< -183 C) para evitar cavitacion en la turbobomba."
+// Usando PicoGK Voxels API.
 
 using PicoGK;
+using System.Numerics;
 
 namespace FFSC_PicoGK.Geometry.Manifolds
 {
-    /// <summary>
-    /// Geometria de manifold LOX avanzado.
-    /// </summary>
     public static class Geometry_Manifold_LOX
     {
-        /// <summary>
-        /// Crea un manifold LOX con colector toroidal y compensacion.
-        /// </summary>
-        /// <param name="radius">Radio del manifold [m]</param>
-        /// <param name="length">Longitud [m]</param>
-        /// <param name="wallThickness">Espesor pared [m]</param>
-        /// <returns>Field3D con la geometria del manifold LOX</returns>
-        public static Field3D Create(
+        public static Voxels Create(
             double radius = 0.18,
             double length = 0.32,
             double wallThickness = 0.012)
         {
-            // Cuerpo principal del manifold
-            var externo = Field3D.Cylinder(radius, length);
-            var interno = Field3D.Cylinder(radius - wallThickness, length);
-            var carcasa = Field3D.Subtract(externo, interno);
+            float R = (float)radius;
+            float L = (float)length;
+            float wt = (float)wallThickness;
 
-            // Colector toroidal superior
-            var colector = Field3D.Torus(radius * 0.8, 0.04)
-                .Translate(0, 0, length * 0.3);
-
-            // Bifurcacion en Y (dos ramas)
-            var rama1 = Field3D.Cylinder(0.05, 0.20)
-                .Rotate(0, Math.PI / 4, 0)
-                .Translate(radius * 0.6, 0, length * 0.6);
-
-            var rama2 = Field3D.Cylinder(0.05, 0.20)
-                .Rotate(0, -Math.PI / 4, 0)
-                .Translate(-radius * 0.6, 0, length * 0.6);
-
-            // Valvulas redundantes
-            Field3D valvulas = Field3D.Empty;
-            for (int i = 0; i < 4; i++)
+            // Cuerpo principal: cilindro de esferas
+            Voxels manifold = Voxels.voxSphere(new Vector3(0, 0, 0), R);
+            for (int i = 1; i < 6; i++)
             {
-                double ang = (2.0 * Math.PI / 4.0) * i;
-                double x = Math.Cos(ang) * (radius + 0.05);
-                double y = Math.Sin(ang) * (radius + 0.05);
-
-                var valvula = Field3D.Cylinder(0.03, 0.12)
-                    .Translate(x, y, length * 0.4);
-                valvulas = Field3D.Combine(valvulas, valvula);
+                float z = i * L / 6.0f;
+                manifold += Voxels.voxSphere(new Vector3(0, 0, z), R);
             }
 
-            return Field3D.Combine(carcasa, colector, rama1, rama2, valvulas);
+            // Colector toroidal
+            float Rtor = R * 0.8f;
+            for (int i = 0; i < 12; i++)
+            {
+                float ang = i * 2.0f * (float)Math.PI / 12.0f;
+                float x = (float)Math.Cos(ang) * Rtor;
+                float y = (float)Math.Sin(ang) * Rtor;
+                manifold += Voxels.voxSphere(new Vector3(x, y, L * 0.3f), 0.04f);
+            }
+
+            // Bifurcaciones en Y
+            float bx = R * 0.6f;
+            manifold += Voxels.voxSphere(new Vector3(bx, 0, L * 0.6f), 0.05f);
+            manifold += Voxels.voxSphere(new Vector3(-bx, 0, L * 0.6f), 0.05f);
+            manifold += Voxels.voxSphere(new Vector3(bx * 0.7f, bx * 0.7f, L * 0.6f), 0.04f);
+            manifold += Voxels.voxSphere(new Vector3(-bx * 0.7f, -bx * 0.7f, L * 0.6f), 0.04f);
+
+            // Valvulas redundantes
+            for (int i = 0; i < 4; i++)
+            {
+                float ang = i * 2.0f * (float)Math.PI / 4.0f;
+                float x = (float)Math.Cos(ang) * (R + 0.05f);
+                float y = (float)Math.Sin(ang) * (R + 0.05f);
+                manifold += Voxels.voxSphere(new Vector3(x, y, L * 0.4f), 0.03f);
+            }
+
+            return manifold;
         }
     }
 }

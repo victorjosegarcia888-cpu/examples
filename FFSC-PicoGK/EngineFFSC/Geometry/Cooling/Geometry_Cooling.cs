@@ -1,42 +1,22 @@
 // Geometry_Cooling.cs
 //
 // Geometria de canales de refrigeracion regenerativa.
-//
-// Incluye:
-// - Canales helicoidales primarios
-// - Canales helicoidales secundarios
-// - Canales en manifold
-//
-// Teoria:
-// - Refrigeracion regenerativa: CH4 fluye por canales en pared
-// - Paso optimo: 2-3 veces ancho de canal
-// - Numero de Nusselt para conveccion interna
-//
-// Cita PDF:
-// "Los canales de refrigeracion regenerativa permiten temperaturas
-//  de pared de hasta 1200 K en camara LOX/CH4."
+// Usando PicoGK Voxels API.
 
 using PicoGK;
+using System.Numerics;
 
 namespace FFSC_PicoGK.Geometry.Cooling
 {
-    /// <summary>
-    /// Geometria de canales de refrigeracion regenerativa.
-    /// </summary>
     public static class Geometry_Cooling
     {
-        /// <summary>
-        /// Crea canales de refrigeracion primarios alrededor de la camara.
-        /// </summary>
-        /// <param name="chamber">Geometria de la camara</param>
-        /// <param name="spike">Geometria del spike</param>
-        /// <param name="channelRadius">Radio del canal [m]</param>
-        /// <param name="pitch">Paso de la helice [m]</param>
-        /// <returns>Field3D con los canales de refrigeracion</returns>
-        public static Field3D Primary(Field3D chamber, Field3D spike,
+        public static Voxels Primary(Voxels chamber, Voxels spike,
             double channelRadius = 0.006, double pitch = 0.02)
         {
-            Field3D canales = Field3D.Empty;
+            float r = (float)channelRadius;
+            float h = (float)pitch;
+
+            Voxels canales = new Voxels();
             double altura = 0.45;
 
             for (double z = 0; z < altura; z += pitch)
@@ -45,21 +25,21 @@ namespace FFSC_PicoGK.Geometry.Cooling
                 double x = Math.Cos(ang) * 0.22;
                 double y = Math.Sin(ang) * 0.22;
 
-                var corte = Field3D.Cylinder(channelRadius, pitch * 0.8)
-                    .Translate(x, y, z);
-                canales = Field3D.Combine(canales, corte);
+                canales += Voxels.voxSphere(new Vector3((float)x, (float)y, (float)z), r);
+                canales += Voxels.voxSphere(new Vector3((float)x, (float)y, (float)(z + h * 0.5f)), r);
             }
 
-            return Field3D.Subtract(chamber, canales);
+            // Canales se muestran como volumen positivo en la geometria
+            return canales;
         }
 
-        /// <summary>
-        /// Crea canales de refrigeracion secundarios.
-        /// </summary>
-        public static Field3D Secondary(Field3D chamber, Field3D spike,
+        public static Voxels Secondary(Voxels chamber, Voxels spike,
             double channelRadius = 0.004, double pitch = 0.015)
         {
-            Field3D canales = Field3D.Empty;
+            float r = (float)channelRadius;
+            float h = (float)pitch;
+
+            Voxels canales = new Voxels();
             double altura = 0.45;
 
             for (double z = 0; z < altura; z += pitch)
@@ -68,35 +48,32 @@ namespace FFSC_PicoGK.Geometry.Cooling
                 double x = Math.Cos(ang) * 0.18;
                 double y = Math.Sin(ang) * 0.18;
 
-                var corte = Field3D.Cylinder(channelRadius, pitch * 0.8)
-                    .Translate(x, y, z);
-                canales = Field3D.Combine(canales, corte);
+                canales += Voxels.voxSphere(new Vector3((float)x, (float)y, (float)z), r);
+                canales += Voxels.voxSphere(new Vector3((float)x, (float)y, (float)(z + h * 0.5f)), r);
             }
 
-            return Field3D.Subtract(chamber, canales);
+            return canales;
         }
 
-        /// <summary>
-        /// Crea canales de refrigeracion para el manifold.
-        /// </summary>
-        public static Field3D Manifold(Field3D manifold,
+        public static Voxels Manifold(Voxels manifold,
             double channelRadius = 0.008, double pitch = 0.02,
             double trayectoriaRadius = 0.12, double length = 0.32)
         {
-            Field3D canales = Field3D.Empty;
+            float r = (float)channelRadius;
+            float tr = (float)trayectoriaRadius;
+
+            Voxels canales = new Voxels();
 
             for (double z = 0; z < length; z += pitch)
             {
                 double ang = z * 10.0;
-                double x = Math.Cos(ang) * trayectoriaRadius;
-                double y = Math.Sin(ang) * trayectoriaRadius;
+                double x = Math.Cos(ang) * tr;
+                double y = Math.Sin(ang) * tr;
 
-                var corte = Field3D.Cylinder(channelRadius, pitch * 0.8)
-                    .Translate(x, y, z);
-                canales = Field3D.Combine(canales, corte);
+                canales += Voxels.voxSphere(new Vector3((float)x, (float)y, (float)z), r);
             }
 
-            return Field3D.Subtract(manifold, canales);
+            return canales;
         }
     }
 }

@@ -7,7 +7,7 @@
 // To the extent possible under law, the author has waived all copyright and
 // related or neighboring rights to this example code file.
 //
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -17,13 +17,12 @@
 //
 
 using PicoGK;
-using PicoGKExamples;
+using FFSC_PicoGK.EngineFFSC;
 
 // This simple call runs PicoGK with the specified task and shows the PicoGK viewer
 
-Library.Go( 0.5f, FFSCShowcase.Task );
-                   // size of each voxel in millimeters
-                  // the task you want to execute
+Library.Go(0.5f, FFSCShowcase_Advanced.Task);
+                    // size of each voxel in millimeters
+                   // the task you want to execute
 
 // After you close the viewer, the application exits.
-

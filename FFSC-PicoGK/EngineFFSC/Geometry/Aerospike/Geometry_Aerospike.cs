@@ -1,51 +1,41 @@
 // Geometry_Aerospike.cs
 //
-// Geometria de aerospike lineal (altitude-compensating).
-//
-// Teoria:
-// - El aerospike compensa automaticamente la presion ambiental
-// - Base toroidal crea efecto de expansion adaptativa
-// - Altura optima segun ratio de expansion deseado
-// - No requiere campana de tobera
-//
-// Cita PDF:
-// "El aerospike lineal ofrece compensacion de altitud natural
-//  sin sistemas activos. Ideal para vehiculos reutilizables."
+// Geometria de aerospike lineal.
+// Usando PicoGK Voxels API.
 
 using PicoGK;
+using System.Numerics;
 
 namespace FFSC_PicoGK.Geometry.Aerospike
 {
-    /// <summary>
-    /// Geometria de aerospike lineal FFSC.
-    /// </summary>
     public static class Geometry_Aerospike
     {
-        /// <summary>
-        /// Crea un aerospike completo con base toroidal.
-        /// </summary>
-        /// <param name="length">Longitud del spike [m]</param>
-        /// <param name="baseRadius">Radio de la base toroidal [m]</param>
-        /// <returns>Field3D con la geometria del aerospike</returns>
-        public static Field3D Create(double length = 0.55, double baseRadius = 0.15)
+        public static Voxels Create(double length = 0.55, double baseRadius = 0.15)
         {
-            // Spike conico truncado
-            var spike = Field3D.Cone(0.02, 0.15, length)
-                .Translate(0, 0, -length * 0.5);
+            float L = (float)length;
+            float Rbase = (float)baseRadius;
 
-            // Base toroidal (anillo de expansion)
-            var baseTorus = Field3D.Torus(baseRadius, 0.03)
-                .Translate(0, 0, length * 0.3);
+            // Spike conico truncado (series de esferas)
+            Voxels spike = Voxels.voxSphere(new Vector3(0, 0, -L * 0.5f), 0.02f);
+            spike += Voxels.voxSphere(new Vector3(0, 0, -L * 0.3f), 0.05f);
+            spike += Voxels.voxSphere(new Vector3(0, 0, -L * 0.1f), 0.08f);
+            spike += Voxels.voxSphere(new Vector3(0, 0, L * 0.1f), 0.12f);
+            spike += Voxels.voxSphere(new Vector3(0, 0, L * 0.3f), 0.15f);
 
-            var aerospike = Field3D.Combine(spike, baseTorus);
+            // Base toroidal (serie de esferas en circulo)
+            Voxels torus = Voxels.voxSphere(new Vector3(Rbase, 0, L * 0.3f), 0.03f);
+            for (int i = 1; i < 16; i++)
+            {
+                float ang = i * 2.0f * (float)Math.PI / 16.0f;
+                float x = (float)Math.Cos(ang) * Rbase;
+                float y = (float)Math.Sin(ang) * Rbase;
+                torus += Voxels.voxSphere(new Vector3(x, y, L * 0.3f), 0.03f);
+            }
 
-            return aerospike;
+            return spike + torus;
         }
 
-        /// <summary>
-        /// Crea un aerospike con parametros de motor.
-        /// </summary>
-        public static Field3D Create(FFSC_PicoGK.Models.EngineParams p)
+        public static Voxels Create(FFSC_PicoGK.Models.EngineParams p)
         {
             return Create(p.ChamberLength * 1.1, p.ExitRadius * 0.2);
         }

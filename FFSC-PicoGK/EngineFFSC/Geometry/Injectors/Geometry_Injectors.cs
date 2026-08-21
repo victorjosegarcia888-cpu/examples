@@ -1,78 +1,57 @@
 // Geometry_Injectors.cs
 //
 // Geometria de inyectores coaxiales FFSC.
-//
-// Teoria:
-// - Inyector coaxial: LOX en post central, CH4 en anillo exterior
-// - Atomizacion por cortadura de shear
-// - Angulo de swirl para atomizacion fina
-// - Numero tipico: 24-32 inyectores
-// - Patron de mezcla optimo para combustion estable
-//
-// Cita PDF:
-// "Los inyectores coaxiales son el estandar en motores de alta
-//  performance como Raptor y BE-4. El flujo de LOX en nucleo
-//  y CH4 en anillo permite mezcla rapida y combustion completa."
+// Usando PicoGK Voxels API.
 
 using PicoGK;
+using System.Numerics;
 
 namespace FFSC_PicoGK.Geometry.Injectors
 {
-    /// <summary>
-    /// Geometria de placa de inyectores coaxiales FFSC.
-    /// </summary>
     public static class Geometry_Injectors
     {
-        /// <summary>
-        /// Crea la placa de inyectores completa.
-        /// </summary>
-        /// <param name="count">Numero de inyectores</param>
-        /// <param name="plateRadius">Radio de la placa [m]</param>
-        /// <param name="loxPostRadius">Radio del post LOX [m]</param>
-        /// <param name="ch4AnnulusWidth">Ancho del anillo CH4 [m]</param>
-        /// <param name="injectorLength">Longitud del inyector [m]</param>
-        /// <returns>Field3D con la geometria de los inyectores</returns>
-        public static Field3D Create(
+        public static Voxels Create(
             int count = 32,
             double plateRadius = 0.24,
             double loxPostRadius = 0.008,
             double ch4AnnulusWidth = 0.004,
             double injectorLength = 0.06)
         {
+            float pr = (float)plateRadius;
+            float loxR = (float)loxPostRadius;
+            float ch4R = loxR + (float)ch4AnnulusWidth;
+            float ilen = (float)injectorLength;
+
             // Placa base
-            var placa = Field3D.Cylinder(plateRadius, 0.02);
-
-            Field3D inyectores = Field3D.Empty;
-
-            for (int i = 0; i < count; i++)
+            Voxels plate = Voxels.voxSphere(new Vector3(0, 0, 0), pr);
+            for (int i = 1; i < 3; i++)
             {
-                double ang = (2.0 * Math.PI / count) * i;
-                double r = plateRadius * 0.7;
-                double x = Math.Cos(ang) * r;
-                double y = Math.Sin(ang) * r;
-
-                // Post LOX central
-                var postLOX = Field3D.Cylinder(loxPostRadius, injectorLength)
-                    .Translate(x, y, 0.01);
-
-                // Anillo CH4
-                var annulusCH4 = Field3D.Cylinder(loxPostRadius + ch4AnnulusWidth, injectorLength)
-                    .Subtract(Field3D.Cylinder(loxPostRadius, injectorLength))
-                    .Translate(x, y, 0.01);
-
-                inyectores = Field3D.Combine(inyectores, postLOX, annulusCH4);
+                float z = i * 0.01f;
+                plate += Voxels.voxSphere(new Vector3(0, 0, z), pr);
             }
 
-            return Field3D.Combine(placa, inyectores);
+            // Inyectores distribuidos radialmente
+            Voxels injectors = new Voxels();
+            for (int i = 0; i < count; i++)
+            {
+                float ang = i * 2.0f * (float)Math.PI / count;
+                float r = pr * 0.7f;
+                float x = (float)Math.Cos(ang) * r;
+                float y = (float)Math.Sin(ang) * r;
+
+                // Post LOX central
+                injectors += Voxels.voxSphere(new Vector3(x, y, 0.01f + ilen * 0.5f), loxR);
+
+                // Anillo CH4 (representado como esfera exterior)
+                injectors += Voxels.voxSphere(new Vector3(x, y, 0.01f + ilen * 0.5f), ch4R);
+            }
+
+            return plate + injectors;
         }
 
-        /// <summary>
-        /// Crea inyectores con parametros de motor.
-        /// </summary>
-        public static Field3D Create(FFSC_PicoGK.Models.EngineParams p)
+        public static Voxels Create(FFSC_PicoGK.Models.EngineParams p)
         {
-            return Create(p.MixtureRatio > 3.0 ? 32 : 24,
-                p.ChamberRadius * 0.7);
+            return Create(p.MixtureRatio > 3.0 ? 32 : 24, p.ChamberRadius * 0.7);
         }
     }
 }

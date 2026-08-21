@@ -1,42 +1,16 @@
 // Geometry_Manifold_FFSC.cs
 //
 // Geometria del manifold FFSC completo.
-//
-// Incluye:
-// - Lineas de preburner
-// - Lineas de retorno
-// - Lineas de mezcla
-// - Conexiones de turbobomba
-//
-// Teoria:
-// - Ciclo cerrado FFSC: oxidizante y combustible pasan por preburner
-// - Flujo de retorno envia gases precombustidos a turbina
-// - Relacion de mezcla variable (MR = 3.6 tipico)
-//
-// Cita PDF:
-// "El ciclo FFSC ofrece mayor eficiencia especifica que el
-//  ciclo de combustion escalonada tradicional."
+// Usando PicoGK Voxels API.
 
 using PicoGK;
+using System.Numerics;
 
 namespace FFSC_PicoGK.Geometry.Manifolds
 {
-    /// <summary>
-    /// Geometria completa del manifold FFSC.
-    /// </summary>
     public static class Geometry_Manifold_FFSC
     {
-        /// <summary>
-        /// Crea el manifold FFSC completo con todas sus lineas.
-        /// </summary>
-        /// <param name="radius">Radio del manifold principal [m]</param>
-        /// <param name="length">Longitud [m]</param>
-        /// <param name="wallThickness">Espesor pared [m]</param>
-        /// <param name="branchCount">Numero de ramas</param>
-        /// <param name="preburnerLineRadius">Radio linea preburner [m]</param>
-        /// <param name="returnLineRadius">Radio linea retorno [m]</param>
-        /// <returns>Field3D con la geometria del manifold FFSC</returns>
-        public static Field3D Create(
+        public static Voxels Create(
             double radius = 0.20,
             double length = 0.40,
             double wallThickness = 0.012,
@@ -44,38 +18,43 @@ namespace FFSC_PicoGK.Geometry.Manifolds
             double preburnerLineRadius = 0.05,
             double returnLineRadius = 0.04)
         {
-            // Cuerpo principal del manifold
-            var externo = Field3D.Cylinder(radius, length);
-            var interno = Field3D.Cylinder(radius - wallThickness, length);
-            var carcasa = Field3D.Subtract(externo, interno);
+            float R = (float)radius;
+            float L = (float)length;
 
-            // Ramas principales
-            Field3D ramas = Field3D.Empty;
-            for (int i = 0; i < branchCount; i++)
+            // Cuerpo principal
+            Voxels manifold = Voxels.voxSphere(new Vector3(0, 0, 0), R);
+            for (int i = 1; i < 7; i++)
             {
-                double ang = (2.0 * Math.PI / branchCount) * i;
-                double x = Math.Cos(ang) * radius;
-                double y = Math.Sin(ang) * radius;
-
-                var rama = Field3D.Cylinder(0.05, 0.22)
-                    .Rotate(Math.PI / 2, 0, 0)
-                    .Translate(x, y, length * 0.5);
-                ramas = Field3D.Combine(ramas, rama);
+                float z = i * L / 7.0f;
+                manifold += Voxels.voxSphere(new Vector3(0, 0, z), R);
             }
 
-            // Linea de preburner (cilindro vertical)
-            var preburner = Field3D.Cylinder(preburnerLineRadius, length * 0.8)
-                .Translate(radius * 0.5, 0, -length * 0.2);
+            // Ramas principales
+            for (int i = 0; i < branchCount; i++)
+            {
+                float ang = i * 2.0f * (float)Math.PI / branchCount;
+                float x = (float)Math.Cos(ang) * R;
+                float y = (float)Math.Sin(ang) * R;
+                manifold += Voxels.voxSphere(new Vector3(x, y, L * 0.5f), 0.05f);
+                manifold += Voxels.voxSphere(new Vector3(x * 1.3f, y * 1.3f, L * 0.7f), 0.04f);
+            }
 
-            // Linea de retorno (curva)
-            var retorno = Field3D.Cylinder(returnLineRadius, length * 0.6)
-                .Translate(-radius * 0.5, 0, -length * 0.1);
+            // Linea de preburner
+            float pbX = R * 0.5f;
+            manifold += Voxels.voxSphere(new Vector3(pbX, 0, -L * 0.2f), (float)preburnerLineRadius);
+            manifold += Voxels.voxSphere(new Vector3(pbX, 0, -L * 0.5f), (float)preburnerLineRadius);
+            manifold += Voxels.voxSphere(new Vector3(pbX, 0, -L * 0.8f), (float)preburnerLineRadius);
+
+            // Linea de retorno
+            float retX = -R * 0.5f;
+            manifold += Voxels.voxSphere(new Vector3(retX, 0, -L * 0.1f), (float)returnLineRadius);
+            manifold += Voxels.voxSphere(new Vector3(retX, 0, -L * 0.4f), (float)returnLineRadius);
 
             // Linea de mezcla
-            var mezcla = Field3D.Cylinder(0.03, length * 0.5)
-                .Translate(0, radius * 0.6, length * 0.2);
+            manifold += Voxels.voxSphere(new Vector3(0, R * 0.6f, L * 0.2f), 0.03f);
+            manifold += Voxels.voxSphere(new Vector3(0, R * 0.9f, L * 0.3f), 0.025f);
 
-            return Field3D.Combine(carcasa, ramas, preburner, retorno, mezcla);
+            return manifold;
         }
     }
 }

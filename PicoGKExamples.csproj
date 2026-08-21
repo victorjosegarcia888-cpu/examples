@@ -11,4 +11,10 @@
     <PackageReference Include="PicoGK" Version="1.7.7.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="config\*.json" />
+    <None Include="docs\**\*.md" />
+    <None Include="*.sh" />
+  </ItemGroup>
+
 </Project>

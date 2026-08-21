@@ -1,60 +1,50 @@
 // Geometry_Supports.cs
 //
 // Geometria de soportes del motor FFSC.
-//
-// Incluye:
-// - Montantes (struts)
-// - Placa base
-// - Estructura de sujecion
-//
-// Teoria:
-// - 4 montantes para distribucion de carga
-// - Angulo optimo: 45 grados respecto a vertical
-// - Material composite o titanio
+// Usando PicoGK Voxels API.
 
 using PicoGK;
+using System.Numerics;
 
 namespace FFSC_PicoGK.Geometry.Supports
 {
-    /// <summary>
-    /// Geometria de soportes del motor FFSC.
-    /// </summary>
     public static class Geometry_Supports
     {
-        /// <summary>
-        /// Crea la estructura de soportes completa.
-        /// </summary>
-        /// <param name="strutCount">Numero de montantes</param>
-        /// <param name="strutRadius">Radio de montantes [m]</param>
-        /// <param name="strutLength">Longitud de montantes [m]</param>
-        /// <param name="basePlateRadius">Radio de placa base [m]</param>
-        /// <returns>Field3D con la geometria de soportes</returns>
-        public static Field3D Create(
+        public static Voxels Create(
             int strutCount = 4,
             double strutRadius = 0.03,
             double strutLength = 0.40,
             double basePlateRadius = 0.50)
         {
-            Field3D struts = Field3D.Empty;
+            float sr = (float)strutRadius;
+            float sl = (float)strutLength;
+            float bpr = (float)basePlateRadius;
 
+            Voxels supports = new Voxels();
+
+            // Struts at 45 degree angles
             for (int i = 0; i < strutCount; i++)
             {
-                double ang = (2.0 * Math.PI / strutCount) * i;
-                double x = Math.Cos(ang) * basePlateRadius * 0.6;
-                double y = Math.Sin(ang) * basePlateRadius * 0.6;
+                float ang = i * 2.0f * (float)Math.PI / strutCount;
+                float bx = (float)Math.Cos(ang) * bpr * 0.6f;
+                float by = (float)Math.Sin(ang) * bpr * 0.6f;
 
-                var strut = Field3D.Cylinder(strutRadius, strutLength)
-                    .Rotate(Math.PI / 4, 0, 0)
-                    .Translate(x, y, -strutLength * 0.7);
-
-                struts = Field3D.Combine(struts, strut);
+                for (float t = 0; t <= 1.0f; t += 0.1f)
+                {
+                    float x = bx * (1.0f - t * 0.5f);
+                    float y = by * (1.0f - t * 0.5f);
+                    float z = -t * sl;
+                    supports += Voxels.voxSphere(new Vector3(x, y, z), sr);
+                }
             }
 
-            // Placa base
-            var basePlate = Field3D.Cylinder(basePlateRadius, 0.04)
-                .Translate(0, 0, -strutLength);
+            // Base plate
+            for (float z = -sl; z <= -sl + 0.04f; z += 0.02f)
+            {
+                supports += Voxels.voxSphere(new Vector3(0, 0, z), bpr);
+            }
 
-            return Field3D.Combine(struts, basePlate);
+            return supports;
         }
     }
 }
