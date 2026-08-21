@@ -22,7 +22,6 @@
     <Compile Remove="01_GettingStarted\**\*.cs" />
     <Compile Remove="FFSC-PicoGK\FFSC_PicoGK.TestRunner\**\*.cs" />
     <Compile Remove="GeometryII\**\*.cs" />
-    <Compile Remove="EngineFFSC\**\*.cs" />
     <Compile Remove="rocket\**\*.cs" />
     <Compile Remove="analysis\**\*.cs" />
     <None Include="FFSC-PicoGK\**\*.json" />
