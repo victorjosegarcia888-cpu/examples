@@ -16,22 +16,33 @@
 // THE SOFTWARE.
 //
 
+using EngineFFSC.EngineAssembly;
+using EngineFFSC.Igniters;
+using EngineFFSC.Preburners;
+using EngineFFSC.Turbopumps;
+using EngineFFSC.CombustionChamber;
+using EngineFFSC.Materials;
+using EngineFFSC.Geometry;
 using PicoGK;
-using PipelineCore;
-using FFSC_PicoGK.Pipeline;
 
-Library.Go(0.5f, () =>
+Library.Go(0.0005f, () =>
 {
-    string pipelinePath = "Pipeline/pipeline.json";
+    FFSC_Engine engine = new FFSC_Engine
+    {
+        Scale = 1.0f,
+        IncludeIgniter = true,
+        IncludePreburners = true,
+        IncludeTurbopump = true,
+        IncludeChamber = true,
+        IncludeNozzle = true,
+        IncludeLattice = true,
+        IncludeQuasicrystal = false,
+        ExportPath = "FFSC_engine_full.stl"
+    };
 
-    var registry = new TaskRegistry();
-    PipelineBuilder.RegisterAllTasks(registry);
+    engine.SetMaterial("Inconel_A286");
 
-    Graph graph = PipelineBuilder.BuildPipeline(pipelinePath, registry);
+    engine.Assemble();
 
-    var scheduler = new Scheduler(registry);
-    Voxels? engine = scheduler.ExecuteAndGetResult<Voxels>(graph, "VisualizarMotor");
-
-    if (engine != null)
-        Library.oViewer().Add(engine);
+    engine.ExportSTL("FFSC_engine_full.stl");
 });

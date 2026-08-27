@@ -26,6 +26,8 @@
     <Compile Remove="rocket\**\*.cs" />
     <Compile Remove="analysis\**\*.cs" />
     <Compile Remove="ShapeKernel\**\*.cs" />
+    <Compile Remove="Complex_rocket\**\*.cs" />
+    <Compile Remove="other_file\**\*.cs" />
     <None Include="FFSC-PicoGK\**\*.json" />
     <None Include="FFSC-PicoGK\**\*.md" />
     <None Include="FFSC-PicoGK\**\*.sh" />
