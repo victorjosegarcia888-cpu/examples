@@ -1,0 +1,204 @@
+ahora puedes leer estos archivos de aqui:
+archivoMotor.txt
+arquitectura.txt
+ecuaciones (1).txt
+ecuaciones.txt
+engineInstrucciones.txt
+enginespecins.txt
+file.tx
+gemini-code-1788527921136.md
+gemini-code-1788527925011.txt
+gemini-code-1788527929825.txt
+gemini-code-1788528018893.md
+gemini-code-1788528023492.cs
+gemini-code-1788528028891.cs
+gemini-code-1788528032090.cs
+gemini-code-1788528036365.cs
+gemini-code-1788533143886 (1).txt
+gemini-code-1788533143886.txt
+gemini-code-1788533307727.txt
+gemini-code-1788533408855.txt
+gemini-code-1788533539224 (1).txt
+gemini-code-1788533539224.tx directorio:https://github.com/victorjosegarcia888-cpu/examples/blob/main/kilo_code_instructions_important/ecuations/rocket_pieces/multiple_files/notas01%20(2).txt leelos y sigue las instrucciones que veas en ellos-ten encuenta que todo el contexto es pikogk c# y los repositorios. en el archivo de notas01(1) vienen notas de que puedes clonar una serie de repositorios o arvchivos para trabajarlos con posteriores instrucciones de otros arvchivos como el de ecuaciones. puedes implementar la solucionde los archivos o clonar topicos de repositorios como helixheat y aplicar las ecuaciones de otras notas de gemini-code o EL archivo ECUACIONES. *************************************************************************************************************************************************************************************************************************
+1.1 Instrucciones para agente de kilocode y materiales documentos-repositorios e información de extracción por carpetas/archivos/parametros del motor Noyron TKL-200 aluminum rocket thruster showcase y variables:
+kilo-code se encargará de extraer la información de los enlaces de los repositorios, los parámetros-variables y scripts para generar y desarrollar scripts y geometria computacional con archivos suyos basados en las
+indicaciones-repositorios de leap 71 y parametros y scripts especificados en este documento y otros posteriores.Ecuaciones, parametros, archivos de c# cs y geometrias para diseñar un motor complejo con geometrias.
+
+ECUACIONES IMPORTANTES PARA C# .net y el framework de geometria computacional pikogk:
+*****************************************************************************************************************************************************************************************
+Contexto de extracción de los archivos y diseño
+Orden	Repositorio	                        Función	                                           Aplicación
+7	victorjosegarcia888-cpu/examples	Codespaces y entorno VS Code para pruebas.	   Integrar scripts de PicoGK y Rust.
+8	victor898989/uhtc-aperiodic-cooling-engine	Motor cerámico con geometría aperiodica.   Referencia para materiales UHTC y zirconia.
+9	victor898989/woven_si2	Materiales trenzados y estructuras resistentes.	                   Aplicar a paredes de cámara y tobera.
+10	victor898989/LEAP71_ShapeKernel	Fork personalizado para materiales resistentes.	           Ajustar parámetros de aluminio o Inconel.
+11	victor898989/LEAP71_QuasiCrystals	Fork para geometría interna generativa.	           Crear patrones de refrigeración aperiodicos.
+12	victor898989/uhtc-nanodb	Base de datos térmica y simulación NanoDB.	           Analizar refrigeración y flujo térmico.
+
+base para generar los archivos en .cs de arquitectura para los agentes:
+01
+Crear la arquitectura del proyecto
+El agente debe generar un proyecto C# con dos archivos principales: EngineTasks.cs y Program.cs.
+Crear solución .NET con un proyecto de consola.
+Añadir referencias a PicoGK, PicoGK.Geometry y librerías auxiliares.
+Crear archivo EngineTasks.cs para lógica geométrica.
+Crear archivo Program.cs para orquestación del pipeline.
+
+02
+Implementar Task 1: Impulsor de Bomba de Combustible
+Generar el impulsor paramétrico con hub cónico y 12 álabes helicoidales.
+Parámetros: Dit=45mm, D2t=134mm, hb=2.5mm.
+Crear hub cónico mediante campos implícitos.
+Generar 12 álabes helicoidales con barrido.
+Sustraer el pasaje central de inducción.
+Devolver un objeto Voxels listo para ensamblaje.
+
+03
+Implementar Task 2: Rotor de Turbina de Oxidador
+Construir el disco central y los 26 álabes axiales aerodinámicos.
+
+Parámetros: diámetro medio=115.4mm, altura=12mm.
+Crear disco central.
+Distribuir 26 álabes según ángulos de velocidad.
+Usar perfiles aerodinámicos paramétricos.
+Devolver Voxels del rotor.
+
+04
+Implementar Task 3: Prequemador y Cárter
+Generar cuerpo principal, colector toroidal y vaciados internos.
+Crear cuerpo cilíndrico.
+Añadir torus para manifold de combustible.
+Vaciado de cámara interna.
+Vaciado del resonador acústico anular.
+Devolver Voxels del prequemador.
+
+05
+Implementar Task 4: Cámara de Combustión y Tobera
+Construir geometría convergente-divergente paramétrica basada en perfiles cuadráticos.
+
+Definir perfil 2D de cámara → garganta → salida.
+Extruir a volumen implícito.
+Vaciado del núcleo central.
+Preparar para canales regenerativos.
+Devolver Voxels de cámara+tobera.
+
+06
+Implementar Task 5: Tuberías de Alta Presión
+Generar ductos paramétricos con trayectorias Bézier y juntas flexibles.
+Conectar turbobombas con prequemador.
+Usar curvas Bézier cúbicas.
+Crear pared hueca (radio exterior – espesor).
+Integrar bellows/corrugaciones.
+Devolver Voxels de ductos.
+
+07
+Implementar Task 6: Canales de Refrigeración Regenerativa
+Crear matriz de canales helicoidales siguiendo el perfil de la tobera.
+
+Generar ~120 canales.
+Aplicar torsión helicoidal (fHelixAngleDeg).
+Sección rectangular/trapezoidal.
+Sustraer canales del cuerpo principal.
+Devolver Voxels de canales.
+
+08
+Orquestar todo en Program.cs
+Program.cs debe ensamblar, filtrar y exportar el motor completo.
+
+Configurar resolución de vóxel: 0.25–0.30mm.
+Invocar cada Task de EngineTasks.
+Ensamblar con Add/Subtract.
+Aplicar OverOffset (+R → -R) para fillets.
+Aplicar GaussianBlur para suavizar aliasing.
+Extraer malla final: new Mesh(voxAssembly).
+Exportar STL y 3MF.
+Crear directorio de salida.
+
+09
+Integrar parámetros del motor ASE / Ursa Major
+El agente debe usar los parámetros reales para validar geometrías.
+
+RPM: 93,000.
+Presiones: entrada 65 psia, salida 2230 psia.
+Caudal: 628–669 gpm.
+Eficiencia: 58%.
+Geometría de cámara/tobera según figuras 4-22 y 4-23.
+
+10
+Mantener escalabilidad basada en vóxeles
+El agente debe aplicar el concepto de Kayser: campos escalares y deformaciones vectoriales.
+Tratar cada componente como nube de puntos.
+Permitir escalado radial/axial.
+Aplicar deformaciones vectoriales.
+Integrar geometrías aperiodicas.
+Preparar para futuras pruebas en Rust.
+
+
+Label	         Función	                                            Repositorio base	                        Complemento de analissi termico
+ChamberHybrid	Cámara de combustión híbrida con canales regenerativos.	    LEAP71_ShapeKernel + LEAP71_HelixHeatX	victor898989/uhtc-aperiodic-cooling-engine
+PlasmaNozzle	Tobera de plasma negra con electrodos y expansión variable. LEAP71_ShapeKernel + LEAP71_QuasiCrystals	victor898989/woven_si2
+VectorTurbine	Turbina de control direccional tipo XA103.	            LEAP71_ShapeKernel	                         victor898989/LEAP71_ShapeKernel
+PreburnerToroid	Mezclador toroidal de combustible y resonador acústico.	    LEAP71_ShapeKernel	                         victor898989/uhtc-nanodb
+CoolingChannels	Matriz helicoidal regenerativa (LH₂/LOX).	            LEAP71_HelixHeatX	                         victor898989/uhtc-aperiodic-cooling-engine
+AperiodicLattice	Refuerzo interno tipo quasicrystal.	            LEAP71_QuasiCrystals	                 victor898989/LEAP71_QuasiCrystals
+HighPressureDucts	Ductos HP con bellows y trayectorias Bézier.	    LEAP71_ShapeKernel	                         victorjosegarcia888-cpu/examples
+***************************************************************************************************************************************************************************************
+Concepto de extracción de los archivos geometría computacional:
+
+repositorios y enlaces a github leap-71 pikogk geometria computacional por voxeles para sacar-extraer archivos con kilo code importantes:
+ Noyron TKL-200 aluminum rocket, quiero analizar los documentos y el contenido de los repositorios para poder escalar con los repositorios de leap 71 pikogk con kilocode(agentes)
+
+Contexto de motor de cohete: Eplus3D and LEAP 71: Noyron TKL-200 aluminum rocket thruster showcase.
+Tu contexto kilocode son estos enlaces: https://leap71.com/formnext_24_eplus/  
+
+Extraer conocimientos o archivos para kilo code:
+Repositorios para ti de referencia para trabajar y analizar parametros de motor() espesores, diametros, volumenes, geometrias aperiodicas refrigerantes. 
+1.https://github.com/leap71/LEAP71_ShapeKernel 
+2.https://github.com/leap71/PicoGK
+3.https://github.com/leap71/PicoGK.Geometry
+4.https://github.com/leap71/LEAP71_LatticeLibrary
+5.https://github.com/leap71/LEAP71_QuasiCrystals.
+6.https://github.com/leap71/LEAP71_HelixHeatX. 
+este es el mio:
+7.https://github.com/victorjosegarcia888-cpu/examples de codespaces vscode. 
+otras ideas de geometrias:
+8.https://github.com/victor898989/uhtc-aperiodic-cooling-engine 
+************************************************************************************************************************************************************************************
+usar los principales de pikogk para el codigo y camaras de combustion de un motor raptor 3(spacex) y analizar la imagen de Noyron TKL-200 aluminum rocket:
+1.https://github.com/victor898989/woven_si2/ este es bueno:https://github.com/victor898989/LEAP71_ShapeKernel para el material resistente del motor:
+2.https://github.com/victor898989/LEAP71_QuasiCrystals geometria interna.
+3.https://github.com/leap71/LEAP71_HelixHeatX. <= APLICA A EcuacionesEinstrucciones.txt APLICAN CLOLANCIONES de files a este archivo con pikogk=>// 1. TENSIONES TERMOMECANICAS Y FATIGA LCF (SUTTON & COFFIN-MANSON)
+sigma_theta_mech = (Pc * r_i) / t_w
+sigma_thermal = (E * alpha * delta_Tw) / (2 * (1 - nu))
+sigma_thermal = (E * alpha * q_flux * t_w) / (2 * k_w * (1 - nu))
+sigma_vm = sqrt(sigma_theta_mech^2 - sigma_theta_mech * sigma_thermal + sigma_thermal^2)
+M_T = (k_w * sigma_y) / (E * alpha)
+delta_epsilon_t = alpha * delta_Tw + (sigma_theta_mech / E)
+(delta_epsilon_t / 2) = (sigma_f_prime / E) * (2 * N_f)^b + epsilon_f_prime * (2 * N_f)^c
+
+// 2. TERMOHIDRAULICA Y PERDIDAS DE CARGA EN CANALES REGENERATIVOS
+delta_P_cool = f * (L / D_h) * ((rho_c * v_c^2) / 2)
+D_h = (4 * A_c) / P_wetted
+Nu_b = 0.021 * (Re_b)^0.8 * (Pr_b)^0.4 * (rho_w / rho_b)^0.3 * (Cp_bar / Cp_b)^n
+Cp_bar = (h_w - h_b) / (T_w - T_b)
+
+// 3. CHOQUE TERMICO TRANSITORIO DE IGNICION (0 - 500 ms)
+alpha_w = k_w / (rho_w * C_w)
+delta_th(t) = 2 * sqrt(alpha_w * t)
+rho_w * C_w * (dT/dt) = d/dz (k_w * (dT/dz))
+beta = (h_g * sqrt(alpha_w * t)) / k_w
+(T_wg(t) - T_i) / (T_aw - T_i) = 1 - exp(beta^2) * erfc(beta)
+sigma_th_transient(t) = - (E * alpha_E / (1 - nu)) * (T_wg(t) - T_i)
+
+// 4. SWBLI, CRITERIO DE SCHMUCKER Y GEOMETRIA AEROSPIKE IMPLICITA 6D
+P_sep / P_a = (1.88 * M_e - 1)^(-0.64)
+nu(M) = sqrt((gamma + 1) / (gamma - 1)) * atan(sqrt(((gamma - 1) / (gamma + 1)) * (M^2 - 1))) - atan(sqrt(M^2 - 1))
+tau = (1 + sqrt(5)) / 2
+e_1 = (1, tau, 0)
+e_2 = (-1, tau, 0)
+e_3 = (0, 1, tau)
+e_4 = (0, -1, tau)
+e_5 = (tau, 0, 1)
+e_6 = (tau, 0, -1)
+q_6D(p) = sum_{i=1..6} cos(p . e_i)
+f_canal(p) = (sqrt(x^2 + y^2) - r_nominal(z)) + A * q_6D(p) <= 0
