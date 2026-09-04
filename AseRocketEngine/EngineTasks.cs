@@ -1,8 +1,16 @@
 // EngineTasks.cs
 //
-// Modulo de tareas parametricas para motor ASE/Ursa Mayor.
+// Modulo de tareas parametricas para motor hibrido regenerativo.
 // Genera geometrias volumetricas usando PicoGK 1.7.7.4 API.
 // Unidades: mm, voxelSize = 0.25 mm
+//
+// Arquitectura basada en instrucciones de notas01.txt:
+// - Task_GenerateVectorTurbine: rotor axial 26 alabes, D=115.4mm, h=12mm
+// - Task_GeneratePreburnerToroid: colector toroidal, R=60mm, espesor=10mm
+// - Task_GenerateFuelPumpImpeller: impulsor helicoidal, Din=45mm, Dout=134mm, 12 alabes
+// - Task_GenerateAperiodicLattice: campo quasicrystal orden=10, amplitud=0.015m, freq=8.0
+// - Task_GenerateCoolingChannels: 120 canales helicoidales, torsion=35°, seccion=1mm
+// - Task_GenerateHybridRocketEngine: ensamblaje completo
 
 using PicoGK;
 using System.Numerics;
@@ -11,8 +19,9 @@ namespace AseRocketEngine.Tasks
 {
     public static class Task_GenerateFuelPumpImpeller
     {
-        // Parametros base: D_in=45mm, D_out=134mm, h_b=2.5mm, 12 alabes helicoidales
+        // Parametros base: Din=45mm, Dout=134mm, hb=2.5mm, 12 alabes helicoidales
         public static Voxels Build(
+            Vector3 origin,
             float dInMm = 45.0f,
             float dOutMm = 134.0f,
             float bladeHeightMm = 2.5f,
@@ -34,7 +43,7 @@ namespace AseRocketEngine.Tasks
                 {
                     if (x * x + y * y <= r * r)
                     {
-                        impeller += Voxels.voxSphere(new Vector3(x, y, z), voxelSize * 0.9f);
+                        impeller += Voxels.voxSphere(origin + new Vector3(x, y, z), voxelSize * 0.9f);
                     }
                 }
             }
@@ -43,7 +52,6 @@ namespace AseRocketEngine.Tasks
             for (int i = 0; i < bladeCount; i++)
             {
                 float baseAngle = 2.0f * MathF.PI * i / bladeCount;
-                float helixPitch = 80.0f;
                 float helixTurns = 1.5f;
 
                 for (float z = -hubLengthMm / 2.0f; z <= hubLengthMm / 2.0f; z += voxelSize)
@@ -60,7 +68,7 @@ namespace AseRocketEngine.Tasks
                     {
                         if (dx * dx + dy * dy <= bladeHeightMm * bladeHeightMm)
                         {
-                            impeller += Voxels.voxSphere(new Vector3(bx + dx, by + dy, z), voxelSize * 0.9f);
+                            impeller += Voxels.voxSphere(origin + new Vector3(bx + dx, by + dy, z), voxelSize * 0.9f);
                         }
                     }
                 }
@@ -76,7 +84,7 @@ namespace AseRocketEngine.Tasks
                 {
                     if (x * x + y * y <= coreR * coreR)
                     {
-                        core += Voxels.voxSphere(new Vector3(x, y, z), voxelSize * 0.9f);
+                        core += Voxels.voxSphere(origin + new Vector3(x, y, z), voxelSize * 0.9f);
                     }
                 }
             }
@@ -85,10 +93,11 @@ namespace AseRocketEngine.Tasks
         }
     }
 
-    public static class Task_GenerateTurbineRotor
+    public static class Task_GenerateVectorTurbine
     {
         // Parametros base: D_mean=115.4mm, h_b=12mm, 26 alabes axiales
         public static Voxels Build(
+            Vector3 origin,
             float dMeanMm = 115.4f,
             float bladeHeightMm = 12.0f,
             int bladeCount = 26,
@@ -107,7 +116,7 @@ namespace AseRocketEngine.Tasks
                 {
                     if (x * x + y * y <= rDisk * rDisk)
                     {
-                        rotor += Voxels.voxSphere(new Vector3(x, y, z), voxelSize * 0.9f);
+                        rotor += Voxels.voxSphere(origin + new Vector3(x, y, z), voxelSize * 0.9f);
                     }
                 }
             }
@@ -129,7 +138,7 @@ namespace AseRocketEngine.Tasks
                         float wy = by + dy;
                         if (wx * wx + wy * wy <= rDisk * rDisk)
                         {
-                            rotor += Voxels.voxSphere(new Vector3(wx, wy, z), voxelSize * 0.9f);
+                            rotor += Voxels.voxSphere(origin + new Vector3(wx, wy, z), voxelSize * 0.9f);
                         }
                     }
                 }
@@ -139,15 +148,17 @@ namespace AseRocketEngine.Tasks
         }
     }
 
-    public static class Task_GeneratePreburnerAssembly
+    public static class Task_GeneratePreburnerToroid
     {
+        // Parametros base: radio=60mm, espesor=10mm
         public static Voxels Build(
+            Vector3 origin,
             float housingRadiusMm = 85.0f,
-            float wallThicknessMm = 5.0f,
+            float wallThicknessMm = 10.0f,
             float chamberLengthMm = 90.0f,
             float ductLengthMm = 120.0f,
             float ductExitRadiusMm = 45.0f,
-            float manifoldMajorRadiusMm = 95.0f,
+            float manifoldMajorRadiusMm = 60.0f,
             float manifoldMinorRadiusMm = 22.0f,
             float absorberRingRadiusMm = 70.0f,
             float absorberRingWidthMm = 8.0f,
@@ -171,7 +182,7 @@ namespace AseRocketEngine.Tasks
                 {
                     if (x * x + y * y <= r * r)
                     {
-                        assembly += Voxels.voxSphere(new Vector3(x, y, z), voxelSize * 0.9f);
+                        assembly += Voxels.voxSphere(origin + new Vector3(x, y, z), voxelSize * 0.9f);
                     }
                 }
             }
@@ -192,7 +203,7 @@ namespace AseRocketEngine.Tasks
                 {
                     if (x * x + y * y <= r * r)
                     {
-                        cavity += Voxels.voxSphere(new Vector3(x, y, z), voxelSize * 0.9f);
+                        cavity += Voxels.voxSphere(origin + new Vector3(x, y, z), voxelSize * 0.9f);
                     }
                 }
             }
@@ -211,7 +222,7 @@ namespace AseRocketEngine.Tasks
                     float x = cx + (float)MathF.Cos(phi) * minorR;
                     float y = cy + (float)MathF.Sin(phi) * minorR;
                     float z = 15.0f + (float)MathF.Sin(phi) * minorR;
-                    assembly += Voxels.voxSphere(new Vector3(x, y, z), voxelSize * 0.9f);
+                    assembly += Voxels.voxSphere(origin + new Vector3(x, y, z), voxelSize * 0.9f);
                 }
             }
 
@@ -227,7 +238,7 @@ namespace AseRocketEngine.Tasks
                     float dist = (float)MathF.Sqrt(x * x + y * y);
                     if (dist >= ar && dist <= ar + aw)
                     {
-                        absorber += Voxels.voxSphere(new Vector3(x, y, z), voxelSize * 0.9f);
+                        absorber += Voxels.voxSphere(origin + new Vector3(x, y, z), voxelSize * 0.9f);
                     }
                 }
             }
@@ -236,21 +247,22 @@ namespace AseRocketEngine.Tasks
         }
     }
 
-    public static class Task_GenerateMainChamberAndNozzle
+    public static class Task_GenerateMainChamberHybrid
     {
+        // Parametros base: Dc=380mm, Dt=198mm, De=1060mm, wall=2-4mm
         public static Voxels Build(
-            float chamberRadiusMm = 190.0f,
+            Vector3 origin,
+            float chamberDiameterMm = 380.0f,
+            float throatDiameterMm = 198.0f,
+            float exitDiameterMm = 1060.0f,
             float chamberLengthMm = 400.0f,
-            float throatRadiusMm = 134.0f,
-            float exitRadiusMm = 1587.0f,
             float nozzleLengthMm = 1729.0f,
-            float wallThicknessMm = 6.0f,
+            float wallThicknessMm = 3.0f,
             float voxelSize = 0.25f)
         {
-            Voxels chamber = new Voxels();
-            float rc = chamberRadiusMm;
-            float rt = throatRadiusMm;
-            float re = exitRadiusMm;
+            float rc = chamberDiameterMm / 2.0f;
+            float rt = throatDiameterMm / 2.0f;
+            float re = exitDiameterMm / 2.0f;
             float lc = chamberLengthMm;
             float ln = nozzleLengthMm;
 
@@ -274,7 +286,7 @@ namespace AseRocketEngine.Tasks
                 {
                     if (x * x + y * y <= r * r)
                     {
-                        inner += Voxels.voxSphere(new Vector3(x, y, z), voxelSize * 0.9f);
+                        inner += Voxels.voxSphere(origin + new Vector3(x, y, z), voxelSize * 0.9f);
                     }
                 }
             }
@@ -299,7 +311,7 @@ namespace AseRocketEngine.Tasks
                 {
                     if (x * x + y * y <= r * r)
                     {
-                        outer += Voxels.voxSphere(new Vector3(x, y, z), voxelSize * 0.9f);
+                        outer += Voxels.voxSphere(origin + new Vector3(x, y, z), voxelSize * 0.9f);
                     }
                 }
             }
@@ -311,12 +323,13 @@ namespace AseRocketEngine.Tasks
     public static class Task_GenerateHighPressureDucts
     {
         public static Voxels Build(
+            Vector3 origin,
             Vector3 pumpOutletFuel,
             Vector3 pumpOutletOx,
             Vector3 preburnerInletFuel,
             Vector3 preburnerInletOx,
-            float outerRadiusMm = 9.0f,
-            float wallThicknessMm = 2.2f,
+            float outerRadiusMm = 22.0f,
+            float wallThicknessMm = 2.0f,
             float voxelSize = 0.25f)
         {
             Voxels ducts = new Voxels();
@@ -324,16 +337,16 @@ namespace AseRocketEngine.Tasks
 
             // Tuberia de combustible
             ducts += BuildDuct(
-                pumpOutletFuel,
-                preburnerInletFuel,
+                origin + pumpOutletFuel,
+                origin + preburnerInletFuel,
                 outerRadiusMm,
                 innerRadius,
                 voxelSize);
 
             // Tuberia de oxidador
             ducts += BuildDuct(
-                pumpOutletOx,
-                preburnerInletOx,
+                origin + pumpOutletOx,
+                origin + preburnerInletOx,
                 outerRadiusMm,
                 innerRadius,
                 voxelSize);
@@ -421,18 +434,19 @@ namespace AseRocketEngine.Tasks
 
     public static class Task_GenerateCoolingChannels
     {
+        // Parametros base: 120 canales, torsion=35°, seccion=1mm
         public static Voxels Build(
-            Voxels nozzleBody,
+            Voxels chamberBody,
             int channelCount = 120,
-            float channelWidthMm = 3.5f,
-            float channelHeightMm = 5.0f,
-            float helixAngleDeg = 15.0f,
+            float channelWidthMm = 1.0f,
+            float channelHeightMm = 1.0f,
+            float helixAngleDeg = 35.0f,
             float voxelSize = 0.25f)
         {
             Voxels channels = new Voxels();
             float helixRad = helixAngleDeg * MathF.PI / 180.0f;
 
-            // Radio aproximado de la tobera en funcion de Z
+            // Radio aproximado de la camara en funcion de Z
             float GetLocalRadius(float z)
             {
                 float rt = 134.11f;
@@ -470,7 +484,101 @@ namespace AseRocketEngine.Tasks
                 }
             }
 
-            return nozzleBody - channels;
+            return chamberBody - channels;
+        }
+    }
+
+    public static class Task_GenerateAperiodicLattice
+    {
+        // Parametros base: orden=10, amplitud=0.015m, frecuencia=8.0
+        public static Voxels Build(
+            Vector3 origin,
+            float sizeMm = 100.0f,
+            int order = 10,
+            float amplitudeMm = 15.0f,
+            float frequency = 8.0f,
+            float voxelSize = 0.25f)
+        {
+            Voxels lattice = new Voxels();
+            float halfSize = sizeMm / 2.0f;
+
+            for (float x = -halfSize; x <= halfSize; x += voxelSize)
+            for (float y = -halfSize; y <= halfSize; y += voxelSize)
+            for (float z = -halfSize; z <= halfSize; z += voxelSize)
+            {
+                // Campo quasicrystal simplificado
+                float val = 0.0f;
+                for (int i = 0; i < order; i++)
+                {
+                    float fi = (float)i / order;
+                    val += (float)MathF.Sin(fi * x * frequency * 0.1f) *
+                           (float)MathF.Cos(fi * y * frequency * 0.1f) *
+                           (float)MathF.Sin(fi * z * frequency * 0.1f);
+                }
+                val /= order;
+
+                if (val > amplitudeMm * 0.1f)
+                {
+                    lattice += Voxels.voxSphere(origin + new Vector3(x, y, z), voxelSize * 0.9f);
+                }
+            }
+
+            return lattice;
+        }
+    }
+
+    public static class Task_GenerateHybridRocketEngine
+    {
+        public static Voxels Build(float voxelSize = 0.25f)
+        {
+            Voxels engine = new Voxels();
+
+            // Posiciones relativas de cada componente
+            Vector3 turbinePos = new Vector3(-250, 150, 0);
+            Vector3 preburnerPos = new Vector3(0, 0, 0);
+            Vector3 impellerPos = new Vector3(-250, 0, 0);
+            Vector3 chamberPos = new Vector3(200, 0, 0);
+            Vector3 latticePos = new Vector3(200, 0, 0);
+
+            // 1. Turbina vectorial
+            Voxels turbine = Task_GenerateVectorTurbine.Build(turbinePos, voxelSize: voxelSize);
+            engine += turbine;
+
+            // 2. Prequemador toroidal
+            Voxels preburner = Task_GeneratePreburnerToroid.Build(preburnerPos, voxelSize: voxelSize);
+            engine += preburner;
+
+            // 3. Impulsor de bomba
+            Voxels impeller = Task_GenerateFuelPumpImpeller.Build(impellerPos, voxelSize: voxelSize);
+            engine += impeller;
+
+            // 4. Camara de combustion hibrida (sin canales de refrigeracion)
+            Voxels chamber = Task_GenerateMainChamberHybrid.Build(chamberPos, voxelSize: voxelSize);
+            engine += chamber;
+
+            // 5. Lattice aperiodico interno
+            Voxels lattice = Task_GenerateAperiodicLattice.Build(latticePos, voxelSize: voxelSize);
+            engine += lattice;
+
+            // 6. Canales regenerativos (se restan de la camara)
+            Voxels coolingChannels = Task_GenerateCoolingChannels.Build(chamber, voxelSize: voxelSize);
+            engine = engine - chamber + coolingChannels;
+
+            // 7. Ductos HP
+            Vector3 pumpOutletFuel = new Vector3(-200, 0, 0);
+            Vector3 pumpOutletOx = new Vector3(-200, 50, 0);
+            Vector3 preburnerInletFuel = new Vector3(0, 0, 0);
+            Vector3 preburnerInletOx = new Vector3(0, 50, 0);
+            Voxels ducts = Task_GenerateHighPressureDucts.Build(
+                new Vector3(0, 0, 0),
+                pumpOutletFuel,
+                pumpOutletOx,
+                preburnerInletFuel,
+                preburnerInletOx,
+                voxelSize: voxelSize);
+            engine += ducts;
+
+            return engine;
         }
     }
 }
