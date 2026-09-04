@@ -1,0 +1,47 @@
+==================================================
+ARCHIVO: raptor3_equations_and_specs.txt
+PROYECTO: Raptor3ConceptEngine / LEAP71 PicoGK
+ENTORNO: C# 12 / VSCode DevContainer
+==================================================
+
+[VARIABLES_GLOBALES]
+- R_throat = 0.045         // Radio de la garganta de la tobera (m)
+- R_exit = 0.120           // Radio de salida de la tobera (m)
+- L_chamber = 0.250        // Longitud de la cámara de combustión (m)
+- L_nozzle = 0.350         // Longitud de la tobera (m)
+- T_wall_max = 2800.0      // Temperatura máxima admisible UHTC (K)
+- P_chamber = 20000000.0   // Presión de cámara (Pa)
+- t_shell = 0.008          // Espesor de pared base (m)
+- phi_lattice = 0.35       // Porosidad de la estructura aperiédica
+
+[EQUACIONES]
+1. Perfil Parabólico de la Tobera (Parabolas Conectadas):
+   R(x) = R_throat + (R_exit - R_throat) * pow(x / L_nozzle, 2)
+
+2. Estimación de Coeficiente Convectivo (Aproximación de Bartz):
+   h_g = [ 0.026 / pow(D_t, 0.2) ] * (pow(mu, 0.2) * Cp / pow(Pr, 0.6)) * pow(P_c / c_star, 0.8) * pow(A_t / A, 0.9) * Sigma
+
+3. Conductividad Térmica Efectiva en Matriz UHTC (ZrB2-SiC con Vidrio Borosilicato Autocurativo):
+   k_eff = V_zrb2 * k_zrb2 + V_sic * k_sic + V_glass * k_glass * f_tortuosity
+
+4. Campo Distancial Implícito (SDF) para Celda Gyroid TPMS (PikoGK Kernel):
+   F_gyroid(x, y, z) = sin(2 * PI * x / L) * cos(2 * PI * y / L) + sin(2 * PI * y / L) * cos(2 * PI * z / L) + sin(2 * PI * z / L) * cos(2 * PI * x / L) - T
+
+[INSTRUCCIONES_PIKOGK_VSCODE]
+1. Configuración del Entorno:
+   - Clonar el repositorio base en VSCode usando el DevContainer configurado para C# 12 y .NET.
+   - Referenciar los ensamblados principales de PicoGK y los repositorios de LEAP71 (LEAP71_ShapeKernel, LEAP71_LatticeLibrary).
+
+2. Inicialización de Voxeles:
+   - Llamar a `PikoGK.Library.Init()` al arrancar el proceso de ejecución principal (`Program.cs`).
+   - Definir la resolución de vóxel voxelSize (ej. 0.5 mm) para equilibrar rendimiento en NanoVDB y precisión geométrica.
+
+3. Generación Paramétrica:
+   - Instanciar la clase central `EngineSystem_Giant` para orquestar los subsistemas de cámara, tobera y canales de refrigeración[cite: 14].
+   - Utilizar bucles de interpolación espacial para mapear las ecuaciones de sección transversal `R(x)` directamente sobre campos escalares volumétricos.
+   - Aplicar los modificadores de celda aperiédica y gyroid en las zonas de intercambio térmico crítico utilizando los kernels de LEAP71.
+
+4. Exportación y Validación:
+   - Consolidar la malla implícita mediante la extracción de isosuperficies (algoritmo Marching Cubes optimizado en NanoVDB).
+   - Exportar a formato compatible con manufactura aditiva (STL/3MF) para la impresión de los componentes UHTC.
+==================================================

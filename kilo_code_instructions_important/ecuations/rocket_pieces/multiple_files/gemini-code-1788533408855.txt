@@ -1,0 +1,100 @@
+==================================================
+ARCHIVO: raptor3_equations_and_specs.txt
+PROYECTO: Raptor3ConceptEngine / LEAP71 PicoGK
+ENTORNO: C# 12 / VSCode + Kilo Code / .NET 8
+==================================================
+
+[VARIABLES_GLOBALES_RAPTOR_3]
+// Parámetros Geométricos y Termodinámicos del Motor
+- Pc = 35000000.0          // Presión de cámara de combustión (Pa) [350 bar nominal Raptor 3]
+- F_thrust_vac = 2690000.0 // Empuje en vacío (N) [~269 tf]
+- F_thrust_sl = 2450000.0  // Empuje a nivel del mar (N) [~245 tf]
+- Isp_vac = 380.0          // Impulso específico en vacío (s)
+- O_F_ratio = 3.55         // Relación de mezcla O/F (Oxígeno Líquido / Metano)
+- R_throat = 0.0825        // Radio del cuello/garganta de la cámara (m)
+- R_chamber = 0.165        // Radio interno de la cámara de combustión (m)
+- R_exit = 0.650           // Radio de salida de la tobera (m)
+- L_chamber = 0.420        // Longitud de la zona de combustión (m)
+- L_convergent = 0.180     // Longitud de la sección convergente (m)
+- L_divergent = 0.850      // Longitud del cono expansor/tobera (m)
+- theta_n = 28.0           // Ángulo de entrada a la tobera (grados)
+- theta_e = 8.5            // Ángulo de salida del labio de la tobera (grados)
+
+// Propiedades de Fluidos (LOX / LCH4 a alta presión)
+- T_lox_in = 90.0          // Temperatura de inyección LOX (K)
+- T_ch4_in = 260.0         // Temperatura de inyección CH4 supercrítico (K)
+- T_gas_flame = 3750.0     // Temperatura de llama adiabática en cámara (K)
+- P_ch4_coolant = 48000000.0 // Presión del metano en canales regenerativos (Pa) [480 bar]
+- c_star = 1820.0          // Velocidad característica C* (m/s)
+- gamma = 1.21             // Coeficiente de expansión adiabática de gases quemados
+- M_molar = 0.0215         // Masa molar media de productos de combustión (kg/mol)
+
+// Parámetros de Manufactura Aditiva y Paredes (UHTC / Inconel / CuCrZr)
+- t_wall_inner = 0.0018    // Espesor de pared caliente interna (m) [1.8 mm]
+- t_wall_outer = 0.0035    // Espesor de la chaqueta estructural externa (m)
+- h_channel = 0.0040       // Altura base de canales de refrigeración regenerativa (m)
+- w_channel_throat = 0.0012 // Ancho de canal regenerativo en la garganta (m)
+- N_channels = 180         // Número total de canales regenerativos helicoidales/axiales
+- phi_porosity_uhtc = 0.28 // Porosidad objetivo para matriz aperiodica UHTC en zonas críticas
+
+
+[EQUACIONES]
+
+1. Perfil Longitudinal Continuo de la Cámara y Tobera (Curva Rao / Parabólica de 3 Tramos):
+   - Sección Convergente (Cámara a Garganta):
+     R_conv(x) = R_throat + (R_chamber - R_throat) * (1 - (x / L_convergent)^2)^0.5
+   - Sección Divergente (Tobera Parabólica de Bell):
+     x_t = L_convergent
+     N(x) = (x - x_t) / L_divergent
+     R_div(x) = R_throat + (R_exit - R_throat) * (0.8 * N(x)^1.8 + 0.2 * N(x))
+
+2. Transferencia de Calor Convectivo Interno (Aproximación Modificada de Bartz):
+   - Coeficiente de transferencia h_g en función de la posición x a lo largo del eje:
+     A_ratio(x) = (PI * R(x)^2) / (PI * R_throat^2)
+     Sigma(x) = [ 0.5 * (T_wall_inner / T_gas_flame) * (1 + 0.5 * (gamma - 1) * M(x)^2) + 0.5 ]^(-0.68) * [ 1 + 0.5 * (gamma - 1) * M(x)^2 ]^(-0.12)
+     h_g(x) = (0.026 / (2 * R_throat)^0.2) * (mu^0.2 * Cp / Pr^0.6) * (Pc / c_star)^0.8 * (1 / A_ratio(x))^0.9 * Sigma(x)
+
+3. Caudal y Caída de Presión en Canales de Refrigeración Regenerativa (Metano Supercrítico):
+   - Velocidad local del refrigerante v_c(x):
+     A_chan(x) = w_channel(x) * h_channel(x)
+     v_c(x) = m_dot_ch4 / (N_channels * rho_ch4 * A_chan(x))
+   - Caída de presión diferencial dp/dx (Darcy-Weisbach en régimen turbulento):
+     Re(x) = (rho_ch4 * v_c(x) * D_hyd(x)) / mu_ch4
+     f_friction(x) = 0.3164 / (Re(x)^0.25)
+     dp/dx = f_friction(x) * (rho_ch4 * v_c(x)^2) / (2 * D_hyd(x))
+
+4. Matriz de Conducción Térmica Anisotrópica en Recubrimiento UHTC Aperiódico (ZrB2-SiC):
+   - Conductividad equivalente k_eff refinada por tortuosidad fractal:
+     tau = 1.0 + 0.45 * ln(1.0 / (1.0 - phi_porosity_uhtc))
+     k_matrix = V_zrb2 * k_zrb2(T) + V_sic * k_sic(T)
+     k_eff(T) = k_matrix * ((1 - phi_porosity_uhtc) / tau)
+
+5. Campo Implícito SDF para Estructuras Gyroid TPMS Moduladas por Gradiente Térmico (PikoGK):
+   - Escala espacial variable L_cell(x) adaptada al flujo de calor local q"(x):
+     L_cell(x) = L_base * (1.0 - 0.5 * (q_flux(x) / q_max))
+     omega(x) = (2 * PI) / L_cell(x)
+     F_tpms(x, y, z) = sin(omega(x) * x) * cos(omega(x) * y) + sin(omega(x) * y) * cos(omega(x) * z) + sin(omega(x) * z) * cos(omega(x) * x) - IsoValue
+
+
+[INSTRUCCIONES_PIKOGK_KILO_CODE]
+
+1. Configuración del Entorno Kilo Code:
+   - Crear o abrir el directorio del proyecto `Raptor3ConceptEngine` en VSCode con la extensión Kilo Code activa.
+   - Asegurar el SDK de .NET 8.0 instalado localmente en el entorno sin contenedores.
+   - Agregar las dependencias de PicoGK (Librerías de BRep/Voxels) y LEAP71 (ShapeKernel / LatticeLibrary) en el archivo `.csproj`.
+
+2. Construcción del Perfil Vóxel Basado en Canales de Alta Presión:
+   - Utilizar `Bikeshed` o la clase `Lathing` de LEAP71_ShapeKernel pasando la ecuación `R(x)` para generar la superficie de revolución del flujo primario.
+   - Extruir radialmente las paredes delgadas `t_wall_inner` para formar el liner metálico interno.
+   - Generar un barrido polar de los `N_channels` (180 canales) ajustando `w_channel(x)` dinámicamente según la superficie periférica en cada sección `x`.
+
+3. Integración de Matriz Gyroid con Gradiente Funcional:
+   - Implementar un kernel de campo escalar en C# usando `Voxels` de PicoGK.
+   - Evaluar `F_tpms(x, y, z)` sobre los puntos del espacio donde se ubica el jacket regenerativo o las estructuras de blindaje UHTC.
+   - Aplicar una operación booleana diferencial (SDF Intersection/Subtract) entre la cáscara del motor y el campo Gyroid para crear los conductos internos de enfriamiento por cambio de fase.
+
+4. Verificación Numérica y Exportación Directa:
+   - Ejecutar la malla voxelizada a una resolución de 0.25 mm (`voxelSize = 0.00025f`) para resolver canales de 1.2 mm en la garganta.
+   - Validar la estanqueidad del modelo (Manifold Check) utilizando las herramientas integradas de PicoGK.
+   - Exportar directamente a formato `.3MF` cargado con campos de densidad para impresoras industriales de metal por fusión en cama de polvo (LPBF/SLM).
+==================================================

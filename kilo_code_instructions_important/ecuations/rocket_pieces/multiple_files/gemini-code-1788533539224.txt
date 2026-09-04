@@ -1,0 +1,79 @@
+===============================================================================
+[EQUATIONS_SPEC] - BIBLIOTECA MATEMÁTICA PARA MÓDULOS EN LEAP71 PIKOGK
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. TRANSFERENCIA DE CALOR CONVECTIVO (SUTTON / APROXIMACIÓN DE BARTZ)
+-------------------------------------------------------------------------------
+Propósito: Definir el mapa de flujo térmico q(z) a lo largo del eje axial del motor
+para modular el espesor de la pared interna t_wall(z) o el radio de canales.
+
+[EQ_BARTZ_01] Coeficiente de Transferencia Convectiva (h_c):
+    h_c = (0.026 / (D_t^0.2)) * ((mu^0.2 * C_p) / (Pr^0.6)) * ((p_c * g_c) / c^*)^0.8 * (A_t / A)^0.9 * sigma
+
+[EQ_BARTZ_02] Flujo Térmico Convectivo por Unidad de Área (q):
+    q = h_c * (T_aw - T_w)
+
+[EQ_BARTZ_03] Equilibrio Conductivo en Pared Continua:
+    q = (k_m / t_wall) * (T_w - T_coolant_side)
+
+
+-------------------------------------------------------------------------------
+2. FLOTACIÓN Y PUNTOS DE ESTANCAMIENTO (SUTTON-GRAVES)
+-------------------------------------------------------------------------------
+Propósito: Evaluar bordes de ataque, rampas aerospike y puntas de tobera.
+
+[EQ_GRAVES_01] Flujo Térmico en Punto de Estancamiento (q_s):
+    q_s = k * sqrt(rho_infinity / R_n) * (v_infinity^3)
+
+
+-------------------------------------------------------------------------------
+3. CARGA TERMOMECÁNICA Y TENSIONES (NASA SP-8120)
+-------------------------------------------------------------------------------
+Propósito: Predecir el fallo estructural por choque térmico y modular el tensor de rigidez.
+
+[EQ_SP8120_01] Tensión Térmica Equivalente (sigma_th):
+    sigma_th = (E * alpha * Delta_T) / (2 * (1 - nu))
+
+[EQ_SP8120_02] Parámetro de Resistencia al Choque Térmico (R_T):
+    R_T = (sigma_y * k_m) / (E * alpha)
+
+
+-------------------------------------------------------------------------------
+4. CINÉTICA DE PIROLISIS DE PCS Y CONTRACCIÓN VOLUMÉTRICA (PDC / VÓXELES)
+-------------------------------------------------------------------------------
+Propósito: Simular la densificación de matrices cerámicas durante curado y pirolisis.
+
+[EQ_PCS_01] Tasa de Conversión Isoconversional de Arrhenius:
+    d_alpha_dt = A * exp(-E_a / (R * T)) * (1 - alpha)^n
+
+[EQ_PCS_02] Contracción Volumétrica Lineal por Vóxel (eps_v):
+    eps_v = 1.0 - ((rho_poly / rho_SiC) * (1.0 - (1.0 - Y_ceramic) * alpha))^(1.0 / 3.0)
+
+[EQ_PCS_03] Modulo de Elasticidad Efectivo Modulado por Conversión (E_voxel):
+    E_voxel = E_poly * (1.0 - alpha) + E_SiC * (alpha^m)
+
+
+-------------------------------------------------------------------------------
+5. PASIVACIÓN, OXIDACIÓN Y RECESIÓN DE BOROSILICATO / UHTC
+-------------------------------------------------------------------------------
+Propósito: Evaluar la formación cinemática del escudo protector en la superficie del vóxel.
+
+[EQ_OX_01] Crecimiento Parabólico-Lineal Modificado (Deal-Grove):
+    dx_ox_dt = (K_p / (2.0 * x_ox + B)) - v_evap
+
+[EQ_OX_02] Constante de Oxidación Parabólica (K_p):
+    K_p = K0 * (P_O2^m) * exp(-E_ox / (R * T_w))
+
+[EQ_OX_03] Tasa de Evaporación y Recesión por Flujo Aerodinámico (v_evap):
+    v_evap = (M_B2O3 / rho_ox) * (p_sat / sqrt(2 * PI * M_B2O3 * R * T_w)) * (1.0 + gamma * sqrt(tau_wall))
+
+
+-------------------------------------------------------------------------------
+6. RESISTENCIA AL PANDEO DE CÁSCARAS CILÍNDRICAS (NASA SP-8007)
+-------------------------------------------------------------------------------
+Propósito: Dimensionar espesores de tanques de combustible y fuselajes delgados.
+
+[EQ_SP8007_01] Tensión Crítica de Pandeo Axial/Presurizado (sigma_cr):
+    sigma_cr = C * E * (t / R) + (P * R) / (2 * t)
+===============================================================================
