@@ -1,0 +1,805 @@
+*************************************************************************************************************************************************************************************************************************
+1.1 Instrucciones para agente de kilocode y materiales documentos-repositorios e información de extracción por carpetas/archivos/parametros del motor Noyron TKL-200 aluminum rocket thruster showcase y variables:
+kilo-code se encargará de extraer la información de los enlaces de los repositorios, los parámetros-variables y scripts para generar y desarrollar scripts y geometria computacional con archivos suyos basados en las
+indicaciones-repositorios de leap 71 y parametros y scripts especificados en este documento y otros posteriores.Ecuaciones, parametros, archivos de c# cs y geometrias para diseñar un motor complejo con geometrias.
+
+ECUACIONES IMPORTANTES PARA C# .net y el framework de geometria computacional pikogk:
+*****************************************************************************************************************************************************************************************
+Contexto de extracción de los archivos y diseño
+Orden	Repositorio	                        Función	                                           Aplicación
+7	victorjosegarcia888-cpu/examples	Codespaces y entorno VS Code para pruebas.	   Integrar scripts de PicoGK y Rust.
+8	victor898989/uhtc-aperiodic-cooling-engine	Motor cerámico con geometría aperiodica.   Referencia para materiales UHTC y zirconia.
+9	victor898989/woven_si2	Materiales trenzados y estructuras resistentes.	                   Aplicar a paredes de cámara y tobera.
+10	victor898989/LEAP71_ShapeKernel	Fork personalizado para materiales resistentes.	           Ajustar parámetros de aluminio o Inconel.
+11	victor898989/LEAP71_QuasiCrystals	Fork para geometría interna generativa.	           Crear patrones de refrigeración aperiodicos.
+12	victor898989/uhtc-nanodb	Base de datos térmica y simulación NanoDB.	           Analizar refrigeración y flujo térmico.
+
+base para generar los archivos en .cs de arquitectura para los agentes:
+01
+Crear la arquitectura del proyecto
+El agente debe generar un proyecto C# con dos archivos principales: EngineTasks.cs y Program.cs.
+Crear solución .NET con un proyecto de consola.
+Añadir referencias a PicoGK, PicoGK.Geometry y librerías auxiliares.
+Crear archivo EngineTasks.cs para lógica geométrica.
+Crear archivo Program.cs para orquestación del pipeline.
+
+02
+Implementar Task 1: Impulsor de Bomba de Combustible
+Generar el impulsor paramétrico con hub cónico y 12 álabes helicoidales.
+Parámetros: Dit=45mm, D2t=134mm, hb=2.5mm.
+Crear hub cónico mediante campos implícitos.
+Generar 12 álabes helicoidales con barrido.
+Sustraer el pasaje central de inducción.
+Devolver un objeto Voxels listo para ensamblaje.
+
+03
+Implementar Task 2: Rotor de Turbina de Oxidador
+Construir el disco central y los 26 álabes axiales aerodinámicos.
+
+Parámetros: diámetro medio=115.4mm, altura=12mm.
+Crear disco central.
+Distribuir 26 álabes según ángulos de velocidad.
+Usar perfiles aerodinámicos paramétricos.
+Devolver Voxels del rotor.
+
+04
+Implementar Task 3: Prequemador y Cárter
+Generar cuerpo principal, colector toroidal y vaciados internos.
+Crear cuerpo cilíndrico.
+Añadir torus para manifold de combustible.
+Vaciado de cámara interna.
+Vaciado del resonador acústico anular.
+Devolver Voxels del prequemador.
+
+05
+Implementar Task 4: Cámara de Combustión y Tobera
+Construir geometría convergente-divergente paramétrica basada en perfiles cuadráticos.
+
+Definir perfil 2D de cámara → garganta → salida.
+Extruir a volumen implícito.
+Vaciado del núcleo central.
+Preparar para canales regenerativos.
+Devolver Voxels de cámara+tobera.
+
+06
+Implementar Task 5: Tuberías de Alta Presión
+Generar ductos paramétricos con trayectorias Bézier y juntas flexibles.
+Conectar turbobombas con prequemador.
+Usar curvas Bézier cúbicas.
+Crear pared hueca (radio exterior – espesor).
+Integrar bellows/corrugaciones.
+Devolver Voxels de ductos.
+
+07
+Implementar Task 6: Canales de Refrigeración Regenerativa
+Crear matriz de canales helicoidales siguiendo el perfil de la tobera.
+
+Generar ~120 canales.
+Aplicar torsión helicoidal (fHelixAngleDeg).
+Sección rectangular/trapezoidal.
+Sustraer canales del cuerpo principal.
+Devolver Voxels de canales.
+
+08
+Orquestar todo en Program.cs
+Program.cs debe ensamblar, filtrar y exportar el motor completo.
+
+Configurar resolución de vóxel: 0.25–0.30mm.
+Invocar cada Task de EngineTasks.
+Ensamblar con Add/Subtract.
+Aplicar OverOffset (+R → -R) para fillets.
+Aplicar GaussianBlur para suavizar aliasing.
+Extraer malla final: new Mesh(voxAssembly).
+Exportar STL y 3MF.
+Crear directorio de salida.
+
+09
+Integrar parámetros del motor ASE / Ursa Major
+El agente debe usar los parámetros reales para validar geometrías.
+
+RPM: 93,000.
+Presiones: entrada 65 psia, salida 2230 psia.
+Caudal: 628–669 gpm.
+Eficiencia: 58%.
+Geometría de cámara/tobera según figuras 4-22 y 4-23.
+
+10
+Mantener escalabilidad basada en vóxeles
+El agente debe aplicar el concepto de Kayser: campos escalares y deformaciones vectoriales.
+Tratar cada componente como nube de puntos.
+Permitir escalado radial/axial.
+Aplicar deformaciones vectoriales.
+Integrar geometrías aperiodicas.
+Preparar para futuras pruebas en Rust.
+
+
+Label	         Función	                                            Repositorio base	                        Complemento de analissi termico
+ChamberHybrid	Cámara de combustión híbrida con canales regenerativos.	    LEAP71_ShapeKernel + LEAP71_HelixHeatX	victor898989/uhtc-aperiodic-cooling-engine
+PlasmaNozzle	Tobera de plasma negra con electrodos y expansión variable. LEAP71_ShapeKernel + LEAP71_QuasiCrystals	victor898989/woven_si2
+VectorTurbine	Turbina de control direccional tipo XA103.	            LEAP71_ShapeKernel	                         victor898989/LEAP71_ShapeKernel
+PreburnerToroid	Mezclador toroidal de combustible y resonador acústico.	    LEAP71_ShapeKernel	                         victor898989/uhtc-nanodb
+CoolingChannels	Matriz helicoidal regenerativa (LH₂/LOX).	            LEAP71_HelixHeatX	                         victor898989/uhtc-aperiodic-cooling-engine
+AperiodicLattice	Refuerzo interno tipo quasicrystal.	            LEAP71_QuasiCrystals	                 victor898989/LEAP71_QuasiCrystals
+HighPressureDucts	Ductos HP con bellows y trayectorias Bézier.	    LEAP71_ShapeKernel	                         victorjosegarcia888-cpu/examples
+***************************************************************************************************************************************************************************************
+Concepto de extracción de los archivos geometría computacional:
+
+repositorios y enlaces a github leap-71 pikogk geometria computacional por voxeles para sacar-extraer archivos con kilo code importantes:
+ Noyron TKL-200 aluminum rocket, quiero analizar los documentos y el contenido de los repositorios para poder escalar con los repositorios de leap 71 pikogk con kilocode(agentes)
+
+Contexto de motor de cohete: Eplus3D and LEAP 71: Noyron TKL-200 aluminum rocket thruster showcase.
+Tu contexto kilocode son estos enlaces: https://leap71.com/formnext_24_eplus/  
+
+Extraer conocimientos o archivos para kilo code:
+Repositorios para ti de referencia para trabajar y analizar parametros de motor() espesores, diametros, volumenes, geometrias aperiodicas refrigerantes. 
+1.https://github.com/leap71/LEAP71_ShapeKernel 
+2.https://github.com/leap71/PicoGK
+3.https://github.com/leap71/PicoGK.Geometry
+4.https://github.com/leap71/LEAP71_LatticeLibrary
+5.https://github.com/leap71/LEAP71_QuasiCrystals.
+6.https://github.com/leap71/LEAP71_HelixHeatX. 
+este es el mio:
+7.https://github.com/victorjosegarcia888-cpu/examples de codespaces vscode. 
+otras ideas de geometrias:
+8.https://github.com/victor898989/uhtc-aperiodic-cooling-engine 
+************************************************************************************************************************************************************************************
+usar los principales de pikogk para el codigo y camaras de combustion de un motor raptor 3(spacex) y analizar la imagen de Noyron TKL-200 aluminum rocket:
+1.https://github.com/victor898989/woven_si2/ este es bueno:https://github.com/victor898989/LEAP71_ShapeKernel para el material resistente del motor:
+2.https://github.com/victor898989/LEAP71_QuasiCrystals geometria interna.
+3.https://github.com/leap71/LEAP71_HelixHeatX.
+4.https://github.com/victor898989/uhtc-nanodb- 
+
+*************************************************************************************************************************************************
+A. Tobera del Noyron TKL‑200
+Usa: PicoGK, ShapeKernel, LatticeLibrary, QuasiCrystals.
+
+Objetivo: definir geometría externa, canales internos, y estructura aperiodica.
+Material: AlSi10Mg o CuCrZr.
+Resultado: STL imprimible.
+
+B. Cámara de combustión
+Usa: HelixHeatX, QuasiCrystals, NanoDB.
+Objetivo: crear canales helicoidales regenerativos y analizar flujo térmico.
+Material: zirconia o UHTC.
+
+Resultado: modelo con refrigeración regenerativa.
+
+C. Ductos y colectores
+Usa: ShapeKernel, LatticeLibrary.
+Objetivo: sintetizar tuberías tipo Raptor 3 con geometría spline.
+Material: Inconel o aluminio.
+Resultado: STL de ductos y colectores.
+
+**************************************************************************************************************************************************************
+CONCEPTO PARA ESCALAR PARAMETROS-VECTORES-VOXELS
+Concepto de escalabilidad (según Kayser y PicoGK)
+Cada pieza se define como nube de puntos voxelizada.
+
+Los vectores tienen campos escalares que puedes estirar o fijar.
+Escala radial y axial → ajusta el radio del motor compacto.
+Usa PicoGK.Geometry para medir volúmenes y espesores.
+
+REPOS:PicoGK para voxelizar.
+QuasiCrystals para patrón interno.
+HelixHeatX para canales de refrigeración
+****************************************************************************************************************************************************************
+Extraer los parametros para generar archivos de los repositorios oficiales de pikogk para levantar un motor.
+1.https://github.com/leap71/LEAP71_ShapeKernel 
+2.https://github.com/leap71/PicoGK
+3.https://github.com/leap71/PicoGK.Geometry
+4.https://github.com/leap71/LEAP71_LatticeLibrary
+5.https://github.com/leap71/LEAP71_QuasiCrystals.
+6.https://github.com/leap71/LEAP71_HelixHeatX. 
+
+este es el mio:
+7.https://github.com/victorjosegarcia888-cpu/examples de codespaces vscode. 
+NASA TM X‑419)
+Parametros-iniciales de diametros.
+Diámetro de entrada: ≈ 48 mm
+Diámetro de salida: ≈ 120 mm
+Ángulo helicoidal: 83°
+Espesor de pared: 2–4 mm
+Radio hub/tip: 0.4
+Material base: AlSi10Mg o CuCrZr
+Velocidad de rotación: ≈ 35 000 rpm
+Estos valores son perfectos para escalar el modelo del Noyron TKL‑200 a un motor más compacto tipo Valox™
+manteniendo la eficiencia térmica y la estabilidad de cavitación.
+****************************************************************************************************************
+Flujo de trabajo para generar el diseño
+Voxelizar geometría base con PicoGK.
+Aplicar patrón aperiodico con LEAP71_QuasiCrystals.
+Insertar canales helicoidales con HelixHeatX.
+Optimizar estructura interna con LatticeLibrary.
+Exportar STL con PicoGK.Geometry
+********************************************************************************************************************
+repositorios de los que extraer materiales en forma de archivos importantes:
+A. Núcleo geométrico (imprescindibles)
+PicoGK — voxelización, campos escalares, geometría base.
+
+PicoGK.Geometry — exportación STL, medición de espesores y volúmenes.
+
+LEAP71_ShapeKernel — superficies spline, contornos de tobera/cámara.
+
+B. Geometría interna avanzada
+LEAP71_LatticeLibrary — lattices estructurales internos.
+
+LEAP71_QuasiCrystals — geometrías aperiodicas tipo cristalografía.
+
+LEAP71_HelixHeatX — canales helicoidales regenerativos.
+Resultado esperado
+Un motor híbrido regenerativo compacto, con:
+Tobera tipo Noyron TKL‑200.
+Cámara de combustión inspirada en el inducer de NASA TM X‑419.
+Escala y modularidad del Valox™.
+Geometría aperiodica y canales helicoidales generativos.
+**********************************************************************************************************************
+otros materiales analisis termico y del motor con c# y c++(opcionales) para una nueva carpeta
+(para integración y materiales)
+victorjosegarcia888-cpu/examples — tu workspace en Codespaces.
+victor898989/uhtc-aperiodic-cooling-engine — motor cerámico UHTC con geometría aperiodica.
+victor898989/woven_si2 — materiales trenzados resistentes.
+victor898989/LEAP71_ShapeKernel — tu fork para materiales resistentes.
+victor898989/LEAP71_QuasiCrystals — tu fork para patrones internos.
+victor898989/uhtc-nanodb — análisis térmico con NanoDB.
+**************************************************************************************************************************************
+Otras referencias:
+Documentos para análisis geométrico
+
+parametros extraibles/se pueden extraer y pasar a script de geometria computacional de pikogk:
+A. NASA TM X‑419 (inducer helicoidal 83° en LH₂)
+Este documento te da:
+Diámetros reales (1.88 in → 47.75 mm).
+Espesores de palas (0.060 in → 1.52 mm).
+Radio hub/tip (0.4).
+Geometría helicoidal útil para cámaras compactas.
+helix-heat exchanger:6.https://github.com/leap71/LEAP71_HelixHeatX.  <= extraer geometrias
+**************************************************************************************************
+MATERIALES DEL MOTOR-ESTRUCTURA
+Cómo se comporta la cavitación en geometrías pequeñas.
+B. Noyron TKL‑200 aluminum rocket thruster
+Te aporta:
+Geometría externa compacta.
+Canales internos tipo vascular.
+Espesores de pared 2–4 mm.
+Material AlSi10Mg.
+Tobera regenerativa imprimible.
+C. Pratt & Whitney Valox™
+Te aporta:
+Escala de motor militar compacto.
+Proporciones de turbofan pequeño.
+Modularidad para integrar tu cámara/tobera generativa.
+**************************************************************************************************************************************************
+Cómo analizar las imágenes del Noyron TKL‑200 (instrucciones específicas) para kilocode!! de ia copilot(also)
+1. Extraer medidas base
+Usa PicoGK:
+csharp
+var vox = new Voxels(resolution);
+vox.AddMesh("noyron_tobera.stl");
+double radius = vox.MeasureRadius();
+double thickness = vox.MeasureWallThickness();
+double volume = vox.MeasureVolume();
+
+2. Identificar geometría interna
+Patrón vascular → usar LEAP71_LatticeLibrary.
+Canales helicoidales → usar LEAP71_HelixHeatX.
+Textura aperiodica → usar LEAP71_QuasiCrystals.
+
+3. Escalar la geometría
+Según Kayser:
+Los voxeles son puntos con campos escalares.
+Puedes estirar radialmente:
+
+csharp
+vox.Scale(new Vector3(1.2, 1.2, 1.0));
+O deformar axialmente:
+
+csharp
+vox.Deform(v => v * Math.Sin(v.z));
+4. Generar la tobera compacta
+Contorno externo → ShapeKernel.
+
+ARCHIVOS DE REPOSITORIOS(EXTRAE)
+Interior → QuasiCrystals repositorio github de leap71 pikogk archivos y carpetas con .cs
+Canales → HelixHeatX. repositorio github de leap71 pikogk archivos y carpetas con .cs
+Refuerzo → LatticeLibrary. repositorio github de leap71 pikogk archivos y carpetas con .cs
+*********************************************************************************************************************************************************
+B) Otras instrucciones de refuerzo:
+Flujo de trabajo por piezas (tobera → cámara → ductos)
+A. Tobera del Noyron TKL‑200
+
+Repositorios para extraer el material o las geometrias de los archivos:
+PicoGK
+ShapeKernel
+LatticeLibrary
+QuasiCrystals
+HelixHeatX
+
+Pasos:
+Voxelizar STL.
+Medir radio y espesor.
+Generar patrón aperiodico.
+Insertar canales helicoidales.
+Exportar STL.
+
+B. Cámara de combustión
+Repositorios:
+QuasiCrystals
+HelixHeatX
+uhtc-nanodb
+
+Pasos:
+Crear volumen cilíndrico.       (si)
+Aplicar patrón aperiodico.      (si) camara de combustion y elementos criticos
+Insertar canales regenerativos. (si)
+Analizar térmica con NanoDB(opcional) no mandatorio
+
+C. Ductos y tuberías
+Repositorios:
+ShapeKernel
+LatticeLibrary
+
+Pasos:
+Crear spline tubular.
+Insertar lattice interno.
+Exportar STL.
+************************************************************************************************************************************************************************
+De interés pero no aplicar(no aplicable) al generar scripts
+Los voxeles son nubes de puntos autoorganizadas.
+Cada punto tiene un campo escalar.
+Puedes:
+Estirar la geometría.
+Contraerla.
+Deformarla con funciones.
+Aplicar patrones aperiodicos.
+Insertar canales helicoidales.
+Esto permite escalar el Noyron TKL‑200 a un motor compacto tipo Valox™.
+***************************************************************************************************************************************************************
+ motor híbrido regenerativo compacto basado en los repositorios oficiales de leap71, los parametros de extraccion de este archivo txt para kilo code radio/espesor/diametro etc, ecuaciones, scripts, con:
+
+Tobera tipo Noyron TKL‑200.
+
+Cámara inspirada en NASA TM X‑419.
+
+Escala del Valox™.
+
+Geometría aperiodica interna.
+
+Canales helicoidales regenerativos.
+
+Material AlSi10Mg o UHTC.
+********************************************************************************************************************************************************
+Piezas principales para programar en PicoGK
+Nº	Pieza	                              Parámetros clave	                                                  Task sugerida
+1	Cámara híbrida	                      Diámetro cámara = 380 mm, garganta = 198 mm, salida = 1060 mm	  Task_GenerateMainChamberHybrid()
+2	Tobera de plasma	              Ángulo entrada = 25°, expansión = 34°, salida = 10.5°	          Task_GeneratePlasmaNozzle()
+3	Turbina vectorial	              26 álabes axiales, altura = 12 mm	                                  Task_GenerateVectorTurbine()
+4	Prequemador toroidal	              Radio = 60 mm, espesor = 10 mm	                                  Task_GeneratePreburnerToroid()
+5	Canales regenerativos	              120 canales, torsión = 35°	                                  Task_GenerateCoolingChannels()
+6	Lattice aperiodico	              Orden = 10, amplitud = 0.015 m	                                  Task_GenerateAperiodicLattice()
+7	Ductos HP	                      Radio = 22 mm, espesor = 2 mm	                                  Task_GenerateHighPressureDucts()
+******************************************************************************************************************************************************************************************
+Arquitectura del motor híbrido compacto (según el render) para generar los archivos
+(la base de extraccion en/de parametros y extraccion de geometria de los repositorios anteriores)
+1 — Turbina Vectorial
+Rotor axial tipo XA103, 26 álabes, controla el vector del empuje.
+
+2 — Impulsor de Bomba
+Impulsor helicoidal criogénico estilo ASE.
+
+3 — Prequemador Toroidal
+Colector toroidal + resonador acústico.
+
+4 — Cámara de Combustión Híbrida
+Cámara regenerativa compacta tipo Noyron TKL‑200.
+
+5 — Lattice Aperiodico Interno
+Refuerzo interno tipo quasicrystal.
+
+6 — Canales Regenerativos HelixHeatX
+120 canales helicoidales regenerativos.
+
+7 — Tobera de Plasma Negra
+Tobera cerámica negra UHTC con electrodos.
+
+8 — Electrodos de Ionización
+Generación de plasma en la garganta.
+
+9 — Tobera de Escape
+Salida convergente‑divergente estilo Valox/Noyron.
+**********************************************************************************************************************************************************************************************
+INSTRUCCIONES
+Programar un motor de cohete híbrido regenerativo con geometría compacta, inspirado en los modelos Noyron TKL‑200, Valox™, y XA103, utilizando los repositorios de LEAP 71 y tu entorno de Codespaces.
+
+ 1️.Arquitectura del proyecto
+Archivo	Función	Repositorios base
+EngineTasks.cs	Define las tareas paramétricas de modelado (cada pieza del motor).	LEAP71_ShapeKernel, LEAP71_HelixHeatX, LEAP71_QuasiCrystals, LEAP71_LatticeLibrary
+Program.cs	Ensambla las piezas, aplica operaciones booleanas y exporta STL/3MF.	PicoGK, PicoGK.Geometry
+
+
+2. EngineTasks.cs — Piezas y etiquetas
+Cada Task genera una pieza del motor híbrido.
+El agente debe crear las siguientes funciones:
+
+Task	                        Descripción	                                                        Repositorio
+Task_GenerateVectorTurbine	Rotor axial con 26 álabes, diámetro = 115.4 mm, altura = 12 mm.	         LEAP71_ShapeKernel
+Task_GeneratePreburnerToroid	Colector toroidal de combustible, radio = 60 mm, espesor = 10 mm.	 LEAP71_ShapeKernel
+Task_GenerateFuelPumpImpeller	Impulsor helicoidal, entrada = 45 mm, salida = 134 mm, 12 álabes.	 LEAP71_ShapeKernel
+Task_GenerateAperiodicLattice	Campo quasicrystal orden 10, amplitud 0.015 m, frecuencia 8.0.	         LEAP71_QuasiCrystals
+Task_GenerateCoolingChannels	120 canales helicoidales regenerativos, torsión = 35°, sección = 1 mm.	 LEAP71_HelixHeatX
+Task_GenerateHybridRocketEngine	Ensamblaje completo cámara‑tobera‑turbina‑prequemador.	                 LEAP71_ShapeKernel + PicoGK
+
+
+Cada Task debe:
+
+Crear var vox = new Voxels(0.25);
+
+Definir geometría con las librerías correspondientes.
+
+Aplicar vox.Add() y vox.Subtract() para ensamblar o vaciar volúmenes.
+
+Retornar el objeto vox.
+******************************************************************************************************************************************************************
+Cámara y tobera tipo Noyron TKL‑200.
+
+Turbina vectorial XA103.
+
+Prequemador toroidal ASE.
+
+Impulsor criogénico ASE.
+
+Lattice aperiodico interno.
+
+Canales regenerativos HelixHeatX.
+
+Exportación STL/3MF lista para simulación o impresión.
+********************************************************************************************************************************************************************
+4️. Parámetros geométricos base
+Parámetro	Valor	Unidad
+Diámetro cámara	380	mm
+Diámetro garganta	198	mm
+Diámetro salida	1060	mm
+Ángulo entrada	25	°
+Ángulo expansión	34	°
+Ángulo salida	10.5	°
+Relación de expansión	35	—
+Espesor pared	2–4	mm
+Canales helicoidales	120	—
+Helix angle	35	°
+**********************************************************************************************************************************************************************
+Program.cs — Ensamblaje y exportación
+El agente debe:
+
+Configurar resolución global:
+
+csharp
+Library.Go(0.25);
+var voxAssembly = new Voxels(0.25);
+Invocar cada Task y posicionar:
+
+csharp
+var turbine = EngineTasks.Task_GenerateVectorTurbine();
+turbine.Translate(0, 0, 0.25);
+voxAssembly.Add(turbine);
+Ensamblar todas las piezas:
+
+csharp
+voxAssembly.Add(EngineTasks.Task_GeneratePreburnerToroid());
+voxAssembly.Add(EngineTasks.Task_GenerateFuelPumpImpeller());
+voxAssembly.Add(EngineTasks.Task_GenerateAperiodicLattice());
+voxAssembly.Subtract(EngineTasks.Task_GenerateCoolingChannels());
+Aplicar filtros morfológicos:
+
+csharp
+voxAssembly.DoOffset(+0.003);
+voxAssembly.DoOffset(-0.003);
+voxAssembly.DoGaussianBlur(1.0);
+Exportar malla:
+
+csharp
+var mesh = new Mesh(voxAssembly);
+Library.ExportMeshToStl(mesh, "output/HybridRocketEngine.stl");
+Library.ExportMeshTo3MF(mesh, "output/HybridRocketEngine.3mf");
+Console.WriteLine("Motor híbrido compacto generado y exportado.");
+**************************************************************************************************************************************************************************
+Otras instrucciones:
+Instrucciones para EngineTasks.cs
+Cada Task debe generar una pieza paramétrica del motor.
+El agente debe crear las siguientes funciones:
+
+Task	                         Descripción	                                                        Parámetros clave
+Task_GenerateVectorTurbine()	  Rotor axial con 26 álabes, diámetro = 115.4 mm, altura = 12 mm.	bladeCount, chamber, radius, height
+Task_GeneratePreburnerToroid()	  Colector toroidal de combustible, radio = 60 mm, espesor = 10 mm.	radius, thickness, innerVoid
+Task_GenerateFuelPumpImpeller()	  Impulsor helicoidal, entrada = 45 mm, salida = 134 mm, 12 álabes.	Din, Dout, bladeCount, helixAngleDeg
+Task_GenerateAperiodicLattice()	  Campo quasicrystal orden 10, amplitud 0.015 m, frecuencia 8.0.	order, amplitude, frequency
+Task_GenerateCoolingChannels()	  120 canales helicoidales, torsión = 35°, sección = 1 mm.	        channelCount, helixAngleDeg, thickness
+Task_GenerateHybridRocketEngine()	Ensamblaje completo cámara‑tobera‑turbina‑prequemador.	        Translate(x,y,z), Add/Subtract, DoOffset, DoGaussianBlu
+
+*********************************************************************************************************************************************************************************
+Arquitectura general del motor híbrido compacto
+Módulo	                      Función	                                          Inspiración	        Repositorio base
+VectorTurbine	              Control de empuje direccional y mezcla aire/plasma.	XA103	        LEAP71_ShapeKernel
+PreburnerToroid	              Mezclador toroidal y resonador acústico anular.	  ASE / Ursa Major	LEAP71_ShapeKernel
+FuelPumpImpeller	      Impulsor helicoidal de bomba criogénica.	          ASE / NASA TM X‑419	LEAP71_ShapeKernel
+AperiodicLattice	      Refuerzo interno tipo quasicrystal.	                                LEAP71 QuasiCrystals	victor898989/LEAP71_QuasiCrystals
+CoolingChannels       	      Matriz helicoidal regenerativa LH₂/LOX.	                                HelixHeatX	LEAP71_HelixHeatX
+HybridRocketEngine	      Ensamblaje final compacto tipo Noyron TKL‑200 / Valox / XA103.	         LEAP71 ShapeKernel + PicoGK	victorjosegarcia888-cpu/examples
+
+*********************************************************************************************************************************************************************************************
+Integración con repositorios
+Repositorio	Función
+LEAP71_ShapeKernel	Modelado paramétrico y superficies spline.
+LEAP71_HelixHeatX	Canales helicoidales regenerativos.
+LEAP71_QuasiCrystals	Geometrías aperiodicas internas.
+LEAP71_LatticeLibrary	Lattices estructurales.
+PicoGK / PicoGK.Geometry	Voxelización y exportación STL/3MF.
+victor898989/uhtc-nanodb	Análisis térmico y materiales cerámicos.
+victorjosegarcia888-cpu/examples	Workspace Codespaces para compilación.
+*******************************************************************************************************************************************************************
+Parámetros geométricos base (según documentos NASA TM X‑419 y ASE)
+Parámetro	       Valor	Unidad
+Diámetro cámara	       380	mm
+Diámetro garganta      198	mm
+Diámetro salida	       1060	mm
+Ángulo entrada	        25	°
+Ángulo expansión        34	°
+Ángulo salida	       10.5	°
+
+Relación de expansión	35	—
+Canales helicoidales	120	—
+Helix angle	        35	°
+Espesor pared	        2–4	mm
+***************************************************************************************************************************************************************
+Instrucciones para EngineTasks.cs
+Cada Task debe generar una pieza del motor híbrido.
+El agente debe crear las siguientes funciones:
+Implementar estos archivos/generarlos en base a las instrucciones de este archivo .txt y las indicaciones.(relacion parametro-variable)
+
+Task	                                Descripción	                                                        Repositorio
+Task_GenerateMainChamberHybrid()	Cámara de combustión híbrida con canales regenerativos helicoidales.	LEAP71_ShapeKernel + LEAP71_HelixHeatX
+Task_GeneratePlasmaNozzle()	        Tobera de plasma negra con electrodos y expansión variable.	        LEAP71_ShapeKernel + LEAP71_QuasiCrystals
+Task_GenerateVectorTurbine()	        Turbina vectorial con 26 álabes axiales.	                        LEAP71_ShapeKernel
+Task_GeneratePreburnerToroid()	        Mezclador toroidal y resonador acústico anular.	                        LEAP71_ShapeKernel
+Task_GenerateCoolingChannels()	        Matriz de 120 canales helicoidales regenerativos.	                LEAP71_HelixHeatX
+Task_GenerateAperiodicLattice()	        Refuerzo interno tipo quasicrystal.	                                LEAP71_QuasiCrystals
+Task_GenerateHighPressureDucts()	Ductos HP con bellows y trayectorias Bézier.	                        LEAP71_ShapeKernel
+**********************************************************************************************************************************************************************
+OTROS ANALISIS RELEVANTES
+
+Análisis de las piezas del Noyron TKL‑200
+🔹 Tobera generativa (imagen 1 y 2)
+Tipo: cámara + tobera regenerativa impresa en aluminio.
+
+Medidas aproximadas: radio superior ≈ 40–60 mm, base ≈ 120–150 mm.
+
+Espesor medio: 2–4 mm en paredes internas.
+
+Canales: patrón ramificado tipo vascular lattice (LEAP71_LatticeLibrary).
+
+Material: AlSi10Mg o CuCrZr, compatible con HelixHeatX para refrigeración.
+
+🔹 Cámara de combustión (imagen 5 Excelsior)
+Canales internos: helicoidales y paralelos, ideales para HelixHeatX.
+
+Volumen útil: 0.5–1 L.
+
+Geometría: aperiodica con simetría axial → usa LEAP71_QuasiCrystals.
+
+Refrigeración: flujo regenerativo con combustible.
+
+🔹 Conjunto turbobomba y ductos (imagen 3 y 6)
+Componentes: bombas, válvulas, colectores.
+
+Diámetros: 10–25 mm en ductos principales.
+
+Espesores: 1–2 mm.
+
+Geometría: tubular con curvatura spline → ShapeKernel y PicoGK.Geometry.
+*********************************************************************************************************************************************************
+1) BASE DE PARÁMETROS (PDF “motor” + NASA TM X‑419 + LEAP71) (extraccion de stealth y de Noyron) extrae notas/construye crea-genera scripts
+Estos son los parámetros madre que alimentan todos los scripts.
+Son la base para motores stealth, orbitales, interestelares y Noyron potentes.
+
+🔥 Cámara de combustión (PDF “motor”)
+Parámetros base:
+
+Dc = 0.380 m
+
+Dt = 0.198 m
+
+De = 1.060 m
+
+θ_in = 25°
+
+θ_exp = 34°
+
+θ_exit = 10.5°
+
+wall = 8 mm
+
+material = UHTC
+
+🔧 Turbobomba NASA TM X‑419
+Parámetros base:
+
+Din = 45 mm
+
+Dout = 134 mm
+
+helixAngle = 83°
+
+bladeThickness = 1.52 mm
+
+hubRatio = 0.4
+
+material = Inconel 625
+
+🌀 Inyectores helicoidales (PDF “motor”)
+Parámetros base:
+
+injectorCount = 24
+
+swirlAngle = 45°
+
+channelWidth = 1.5 mm
+
+channelDepth = 2.5 mm
+
+radius = 45 mm
+
+🔥 Preburner toroidal (PDF “motor”)
+Parámetros base:
+
+majorRadius = 60 mm
+
+pipeRadius = 10 mm
+
+wallThickness = 2 mm
+
+feedPorts = 2
+
+⚡ Tobera stealth variable
+Parámetros base:
+
+throat = 198 mm
+
+exit = 620 mm
+
+wall = 6 mm
+
+modulation = sinusoidal
+
+compact = 0.85× radial
+
+🧬 Lattice stealth (LEAP71 QuasiCrystals)
+Parámetros base:
+
+order = 14
+
+amplitude = 0.025
+
+frequency = 12.0
+
+⭐ 2) INSTRUCCIONES BASE PARA TODOS LOS SCRIPTS
+Estas instrucciones son universales y se aplican a cada script:
+
+🧩 Voxelización
+csharp
+var vox = new Voxels(0.25);   // resolución fina
+🧩 Campos escalares avanzados
+csharp
+vox.Modulate(v => Math.Sin(v.x * 5.0) * Math.Cos(v.y * 5.0) * Math.Exp(-v.z));
+🧩 Deformación vectorial
+csharp
+vox.Deform(v => v * (1.0 + 0.15 * Math.Sin(v.z * 2.0)));
+🧩 Compactación militar
+csharp
+vox.Scale(new Vector3(0.70f, 0.70f, 1.25f));
+🧩 Lattice cuasicristalino
+csharp
+vox.Modulate(QuasiCrystals.CreateQuasicrystalField(14, 0.025, 12.0));
+🧩 Geometrías helicoidales (HelixHeatX)
+csharp
+var channel = HelixHeatX.CreateHelicalChannel(
+    width, depth, helixAngle, length
+);
+⭐ 3) SCRIPTS AVANZADOS (LIMPIOS Y EXTENDIDOS)
+Aquí tienes los scripts limpios, extendidos, profesionales, con vectores, campos escalares, geometrías helicoidales, inyectores, preburners, ciclo cerrado, combustible, Noyron, stealth, Raptor 3, interestelar, orbital.
+
+⭐ A) MOTOR STEALTH CON TOBERA VARIABLE
+(militar, compacto, stealth, ciclo cerrado)
+
+csharp
+public static Voxels GenerateStealthEngine()
+{
+    var engine = new Voxels(0.25);
+
+    // Turbina XA103 compactada
+    var turbine = GenerateTurbine();
+    turbine.Scale(new Vector3(0.70f, 0.70f, 0.85f));
+    turbine.Deform(v => v * Math.Sin(v.z * 0.4));
+    engine.Add(turbine);
+
+    // Preburner ciclo cerrado
+    var preburner = GeneratePreburner();
+    preburner.Scale(new Vector3(0.85f, 0.85f, 1.0f));
+    engine.Add(preburner);
+
+    // Inyectores helicoidales
+    engine.Add(GenerateInjectorsStealth());
+
+    // Cámara stealth compacta
+    var chamber = GenerateNoyronAdvancedChamber();
+    engine.Add(chamber);
+
+    // Canales regenerativos densos
+    engine.Subtract(GenerateCoolingChannels());
+
+    // Tobera stealth variable
+    engine.Add(GenerateVariableStealthNozzle());
+
+    // Lattice stealth interno
+    engine.Add(GenerateStealthLattice());
+
+    return engine;
+}
+⭐ B) CÁMARA DE COMBUSTIÓN NOYRON POTENTE
+(basada en PDF “motor” + Noyron TKL‑200 + LEAP71)
+
+csharp
+public static Voxels GenerateNoyronAdvancedChamber()
+{
+    var P = EngineDatabase.ChamberNoyron;
+
+    var profile = ShapeKernel.CreateBellNozzleProfile(
+        P["Dc"], P["Dt"], P["De"],
+        P["thetaIn"], P["thetaExp"], P["thetaExit"]
+    );
+
+    var mesh = ShapeKernel.SweepProfile(profile, P["wallThickness"]);
+    var vox = new Voxels(mesh);
+
+    // Geometría Noyron (PDF motor)
+    vox.Deform(v => v * Math.Sin(v.z * 0.8) * Math.Cos(v.x * 0.5));
+
+    // Lattice interno estilo LEAP71
+    vox.Modulate(QuasiCrystals.CreateQuasicrystalField(16, 0.030, 14.0));
+
+    // Compactación orbital
+    vox.Scale(new Vector3(0.85f, 0.85f, 0.75f));
+
+    return vox;
+}
+⭐ C) MOTOR MILITAR DE COHETE STEALTH (CICLO CERRADO)
+csharp
+public static Voxels GenerateStealthClosedCycle()
+{
+    var engine = new Voxels(0.25);
+
+    engine.Add(GenerateCryoPump());          // NASA TM X‑419
+    engine.Add(GeneratePreburner());         // PDF motor
+    engine.Add(GenerateInjectorsStealth());  // helicoidales
+    engine.Add(GenerateNoyronAdvancedChamber());
+    engine.Subtract(GenerateCoolingChannels());
+    engine.Add(GenerateVariableStealthNozzle());
+    engine.Add(GenerateStealthLattice());
+
+    return engine;
+}
+⭐ 4) EXTENSIÓN AVANZADA DE SCRIPTS
+(campos escalares, vectores, fractales, helix, combustión)
+
+🧩 Campo fractal avanzado
+csharp
+engine.Modulate(v => Math.Sin(v.x * v.y * 3.0) * Math.Cos(v.z * 2.0));
+🧩 Campo Parker Solar Probe
+csharp
+engine.Modulate(v => Math.Exp(-v.z * 0.3) * Math.Sin(v.x * 4.0));
+🧩 Campo de combustión MetaLOX
+csharp
+engine.Modulate(v => Math.Exp(-v.z) * Math.Sin(v.y * 3.6));
+🧩 Geometría helicoidal avanzada (HelixHeatX)
+csharp
+var helix = HelixHeatX.CreateHelicalChannel(
+    0.0022, 0.0035, 45.0, 0.15
+);
+helix.Deform(v => v * Math.Sin(v.z * 1.5));

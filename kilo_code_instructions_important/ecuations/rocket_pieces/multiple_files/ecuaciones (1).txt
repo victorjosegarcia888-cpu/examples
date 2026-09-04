@@ -1,0 +1,35 @@
+// 1. TENSIONES TERMOMECANICAS Y FATIGA LCF (SUTTON & COFFIN-MANSON)
+sigma_theta_mech = (Pc * r_i) / t_w
+sigma_thermal = (E * alpha * delta_Tw) / (2 * (1 - nu))
+sigma_thermal = (E * alpha * q_flux * t_w) / (2 * k_w * (1 - nu))
+sigma_vm = sqrt(sigma_theta_mech^2 - sigma_theta_mech * sigma_thermal + sigma_thermal^2)
+M_T = (k_w * sigma_y) / (E * alpha)
+delta_epsilon_t = alpha * delta_Tw + (sigma_theta_mech / E)
+(delta_epsilon_t / 2) = (sigma_f_prime / E) * (2 * N_f)^b + epsilon_f_prime * (2 * N_f)^c
+
+// 2. TERMOHIDRAULICA Y PERDIDAS DE CARGA EN CANALES REGENERATIVOS
+delta_P_cool = f * (L / D_h) * ((rho_c * v_c^2) / 2)
+D_h = (4 * A_c) / P_wetted
+Nu_b = 0.021 * (Re_b)^0.8 * (Pr_b)^0.4 * (rho_w / rho_b)^0.3 * (Cp_bar / Cp_b)^n
+Cp_bar = (h_w - h_b) / (T_w - T_b)
+
+// 3. CHOQUE TERMICO TRANSITORIO DE IGNICION (0 - 500 ms)
+alpha_w = k_w / (rho_w * C_w)
+delta_th(t) = 2 * sqrt(alpha_w * t)
+rho_w * C_w * (dT/dt) = d/dz (k_w * (dT/dz))
+beta = (h_g * sqrt(alpha_w * t)) / k_w
+(T_wg(t) - T_i) / (T_aw - T_i) = 1 - exp(beta^2) * erfc(beta)
+sigma_th_transient(t) = - (E * alpha_E / (1 - nu)) * (T_wg(t) - T_i)
+
+// 4. SWBLI, CRITERIO DE SCHMUCKER Y GEOMETRIA AEROSPIKE IMPLICITA 6D
+P_sep / P_a = (1.88 * M_e - 1)^(-0.64)
+nu(M) = sqrt((gamma + 1) / (gamma - 1)) * atan(sqrt(((gamma - 1) / (gamma + 1)) * (M^2 - 1))) - atan(sqrt(M^2 - 1))
+tau = (1 + sqrt(5)) / 2
+e_1 = (1, tau, 0)
+e_2 = (-1, tau, 0)
+e_3 = (0, 1, tau)
+e_4 = (0, -1, tau)
+e_5 = (tau, 0, 1)
+e_6 = (tau, 0, -1)
+q_6D(p) = sum_{i=1..6} cos(p . e_i)
+f_canal(p) = (sqrt(x^2 + y^2) - r_nominal(z)) + A * q_6D(p) <= 0

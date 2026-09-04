@@ -1,0 +1,629 @@
+===========================================================
+SPACE X RAPTOR ENGINE — PARAMETERS & GEOMETRY SPECIFICATION
+===========================================================
+===========================================================
+SPACE X RAPTOR ENGINE — FULL SPECIFICATION + DEV GUIDE
+===========================================================
+Instrucciones para un agente ejm kilocode: extraer los parametros y geometrias
+con esta base del archivo txt para generar geometrias solidas, geom computacional con los repositorios
+de base de Leap 71 especificados en otro file.txt llamado 
+
+ORIGEN: Wikipedia Raptor Engine + enlaces técnicos del PDF
+TIPO: Motor FFSC (Full-Flow Staged Combustion)
+PROPELENTE: LOX / CH4 (Methalox)
+MEZCLA: O/F = 3.6 (78% O2, 22% CH4)
+
+-----------------------------------------------------------
+1. CICLO TERMODINÁMICO (FFSC)
+-----------------------------------------------------------
+- Preburner fuel-rich (CH4)
+- Preburner oxidizer-rich (O2)
+- Ambos gases entran calientes a la cámara
+- 2 turbobombas independientes (dual-shaft)
+- Cavitación reducida por propulsante subenfriado
+- Mejor mezcla y mayor eficiencia térmica
+
+-----------------------------------------------------------
+2. PRESIÓN DE CÁMARA
+-----------------------------------------------------------
+Raptor 1: 250 bar
+Raptor 2: 300 bar
+Raptor 3: 330–350 bar
+
+Pc_script = 330e5   // Pascales para FFSC
+
+-----------------------------------------------------------
+3. EMPUJE (SEA LEVEL / VACUUM)
+-----------------------------------------------------------
+Raptor 1:
+  SL: 185 tf (1814 kN)
+  VAC: 258 tf (2530 kN)
+
+Raptor 2:
+  SL: 230 tf (2256 kN)
+  VAC: 258 tf (2530 kN)
+
+Raptor 3:
+  SL: 250 tf (2452 kN)
+  VAC: 275 tf (2697 kN)
+
+Throttle range: 40–100%
+
+-----------------------------------------------------------
+4. ISP (IMPULSO ESPECÍFICO)
+-----------------------------------------------------------
+Sea Level: 327 s
+Vacío (SL nozzle): 350 s
+Vacío (Vac nozzle): 380 s
+
+-----------------------------------------------------------
+5. FLUJO MÁSICO
+-----------------------------------------------------------
+Total: ~650 kg/s
+Oxígeno: ~510 kg/s
+Metano: ~140 kg/s
+
+mdot_total = 650
+mdot_ox = 510
+mdot_fuel = 140
+
+-----------------------------------------------------------
+6. GEOMETRÍA DE TOBERA (EXPANSIÓN)
+-----------------------------------------------------------
+Sea Level: 34.34 : 1
+Vacuum: 80 : 1
+
+Bell profile angles:
+theta_in = 25°
+theta_exp = 34°
+theta_exit = 10.5°
+
+-----------------------------------------------------------
+7. DIMENSIONES
+-----------------------------------------------------------
+Longitud: 3.1 m
+Diámetro: 1.3 m
+
+-----------------------------------------------------------
+8. MASA SECA
+-----------------------------------------------------------
+Raptor 1: 2080 kg
+Raptor 2: 1630 kg
+Raptor 3: 1525 kg
+
+-----------------------------------------------------------
+9. MATERIALES Y FABRICACIÓN
+-----------------------------------------------------------
+- 40% del motor impreso en 3D (prototipos 2016)
+- Turbobombas impresas en 3D
+- Inyectores impresos en 3D
+- Colectores fundidos en Inconel SX300
+- SX300 mejorado a SX500 (2019)
+- Superaleaciones internas para soportar 330–350 bar
+- UHTC en garganta de tobera
+- SX500 para manifolds de alta presión
+
+MaterialSpec:
+  SX300:
+    - Superaleación Ni-Cr
+    - Alta resistencia térmica
+    - Fundición (cast)
+  SX500:
+    - Versión mejorada
+    - Mayor resistencia a creep
+    - Manifolds FFSC
+  A286:
+    - Turbomachinery
+    - Alta resistencia a fatiga
+  UHTC:
+    - Tobera y garganta
+    - 3000–3500 K
+
+-----------------------------------------------------------
+10. INYECTORES
+-----------------------------------------------------------
+Tipo: Coaxial Swirl Injector
+Cantidad: 24–36
+Swirl angle: 45°
+Distribución radial
+Ideal para FFSC (ambos gases calientes)
+
+-----------------------------------------------------------
+11. ECUACIONES PARA SCRIPTS FFSC
+-----------------------------------------------------------
+
+// Mezcla
+O_F = mdot_ox / mdot_fuel = 3.6
+
+// Presión de cámara
+Pc = 330e5
+
+// Empuje
+F = mdot_total * Ve + (Pe - Pa) * Ae
+
+// Isp
+Isp = Ve / g0
+
+// Perfil Bell
+R(x) = a0 + a1*x + a2*x^2 + a3*x^3
+
+// Canal helicoidal
+r(t) = R * cos(t)
+z(t) = pitch * t
+
+-----------------------------------------------------------
+12. GEOMETRÍA PARA PICO GK / LEAP71
+-----------------------------------------------------------
+
+Cámara:
+Dc = 1.3 m
+Dt = 0.198 m
+De_SL = 0.62 m
+De_VAC = 1.5 m
+
+Ángulos:
+theta_in = 25°
+theta_exp = 34°
+theta_exit = 10.5°
+
+Inyectores:
+count = 24–36
+swirl_angle = 45°
+
+Cooling:
+channels = 120
+helix_angle = 35°
+
+Preburners:
+type = ORPB + FRPB
+geometry = toroidal manifold + cylindrical core
+
+Turbopumps:
+dual-shaft
+flow = 650 kg/s total
+
+-----------------------------------------------------------
+13. COMPARACIÓN CON OTROS MOTORES (WIKIPEDIA)
+-----------------------------------------------------------
+
+Raptor 3 SL:
+  Empuje: 2750 kN
+  Isp: 350 s
+  TWR: 200
+  Propulsante: CH4/LOX subenfriado
+  Ciclo: FFSC
+
+Raptor 3 Vac:
+  Empuje: 2980 kN
+  Isp: 380 s
+  TWR: 120
+
+Merlin 1D:
+  Empuje: 914 kN
+  Isp: 311 s
+  TWR: 176
+  Ciclo: Gas Generator
+
+BE-4:
+  Empuje: 2400 kN
+  Isp: 339 s
+  Ciclo: Oxidizer-rich staged combustion
+
+RD-170:
+  Empuje: 7904 kN
+  Isp: 337 s
+  Ciclo: Oxidizer-rich staged combustion
+
+RS-25:
+  Empuje: 2280 kN
+  Isp: 453 s
+  Ciclo: Fuel-rich staged combustion
+
+-----------------------------------------------------------
+14. INSTRUCCIONES PARA DESARROLLAR EL SCRIPT EN VSCode
+-----------------------------------------------------------
+
+1) Crear estructura:
+examples/EngineFFSC/
+    Core/
+    Geometry/
+    Preburners/
+    Turbopumps/
+    CombustionChamber/
+    Nozzle/
+    Materials/
+    EngineAssembly/
+    Specs/
+    Program.cs
+
+2) Copiar este archivo en:
+examples/EngineFFSC/Specs/RAPTOR_FFSC_FULL_SPEC.txt
+
+3) Crear clase RaptorSpec.cs:
+- Cargar todos los parámetros de este archivo
+- Exponerlos como constantes o propiedades
+
+4) Crear módulos:
+- ChamberFFSC_Raptor.cs
+- Nozzle_Raptor3.cs
+- Preburner_ORPB.cs
+- Preburner_FRPB.cs
+- Turbopump_Raptor.cs
+- InjectorCoaxial.cs
+- CoolingHelix.cs
+- MaterialSpec.cs
+
+5) Usar librerías:
+using PicoGK;
+using LEAP71.ShapeKernel;
+using LEAP71.LatticeLibrary;
+using LEAP71.QuasiCrystals;
+using LEAP71.HelixHeatX;
+
+6) Generar geometría:
+- Cámara Bell con CreateBellNozzleProfile()
+- Tobera SL/Vac con SweepProfile()
+- Inyectores coaxiales con extrusiones
+- Preburners toroidales con CreateTorus()
+- Turbopump NASA TM X‑419 con CreateHelicalBlade()
+- Cooling con CreateHelicalChannel()
+- Lattice con QuasicrystalField()
+
+7) Ensamblar motor:
+engine.Add(Chamber)
+engine.Add(Nozzle)
+engine.Add(Preburners)
+engine.Add(Turbopumps)
+engine.Add(Injectors)
+engine.Subtract(CoolingChannels)
+
+8) Exportar:
+Library.ExportMeshToStl()
+Library.ExportMeshTo3MF()
+
+-----------------------------------------------------------
+FIN DEL ARCHIVO
+===========================================================
+
+
+SOURCE: Wikipedia Raptor Engine + linked technical references
+Propellant: LOX / CH4 (Methalox)
+Cycle: Full-Flow Staged Combustion (FFSC)
+Preburners: 2 (Fuel-Rich + Oxidizer-Rich)
+Turbopumps: Dual-shaft, independent
+
+-----------------------------------------------------------
+1. MIXTURE RATIO (O/F)
+-----------------------------------------------------------
+O/F ratio = 3.6 : 1
+Oxygen mass fraction = 78%
+Methane mass fraction = 22%
+
+-----------------------------------------------------------
+2. CHAMBER PRESSURE
+-----------------------------------------------------------
+Raptor 1: 300 bar
+Raptor 2: 330 bar
+Raptor 3: 330–350 bar
+
+Use for FFSC geometry:
+Pc = 330e5 Pa  (approx)
+
+-----------------------------------------------------------
+3. THRUST (SEA LEVEL / VACUUM)
+-----------------------------------------------------------
+Raptor 1:
+  SL: 185 tf (1814 kN)
+  VAC: 258 tf (2530 kN)
+
+Raptor 2:
+  SL: 230 tf (2256 kN)
+  VAC: 258 tf (2530 kN)
+
+Raptor 3:
+  SL: 250 tf (2452 kN)
+  VAC: 275 tf (2697 kN)
+
+Throttle range: 40–100%
+
+-----------------------------------------------------------
+4. SPECIFIC IMPULSE (ISP)
+-----------------------------------------------------------
+Sea Level: 327 s
+Vacuum (SL nozzle): 350 s
+Vacuum (Vac nozzle): 380 s
+
+-----------------------------------------------------------
+5. MASS FLOW RATE
+-----------------------------------------------------------
+Total: ~650 kg/s
+Oxygen: ~510 kg/s
+Methane: ~140 kg/s
+
+Use for FFSC equations:
+mdot_total = 650
+mdot_ox = 510
+mdot_fuel = 140
+
+-----------------------------------------------------------
+6. GEOMETRY — NOZZLE EXPANSION RATIOS
+-----------------------------------------------------------
+Sea Level Nozzle: 34.34 : 1
+Vacuum Nozzle: 80 : 1
+
+Use for PicoGK Bell profile:
+theta_in = 25°
+theta_exp = 34°
+theta_exit = 10.5°
+
+-----------------------------------------------------------
+7. DIMENSIONS
+-----------------------------------------------------------
+Length: 3.1 m
+Diameter: 1.3 m
+
+-----------------------------------------------------------
+8. DRY MASS
+-----------------------------------------------------------
+Raptor 1: 2080 kg
+Raptor 2: 1630 kg
+Raptor 3: 1525 kg
+
+-----------------------------------------------------------
+9. MATERIALS
+-----------------------------------------------------------
+Inconel SX300 / SX500 (manifolds)
+Inconel A286 (turbomachinery)
+UHTC (nozzle throat)
+3D printed structures (40% mass in early prototypes)
+
+-----------------------------------------------------------
+10. FFSC GEOMETRY NOTES
+-----------------------------------------------------------
+- Both propellants arrive as hot gas → better mixing
+- Preburners reduce turbine temperature
+- Dual turbopumps reduce cavitation risk
+- Subcooled propellants increase density
+- Coaxial swirl injector (24–36 injectors)
+- Regenerative cooling in chamber + nozzle
+
+-----------------------------------------------------------
+11. EQUATIONS FOR SCRIPTING
+-----------------------------------------------------------
+
+(1) Mass flow split:
+mdot_total = mdot_ox + mdot_fuel
+
+(2) Mixture ratio:
+O/F = mdot_ox / mdot_fuel = 3.6
+
+(3) Chamber pressure:
+Pc = 330e5 Pa
+
+(4) Thrust:
+F = mdot_total * Ve + (Pe - Pa) * Ae
+
+(5) Specific impulse:
+Isp = Ve / g0
+
+(6) Bell nozzle profile:
+R(x) = a0 + a1*x + a2*x^2 + a3*x^3
+
+(7) Cooling channel helix:
+r(t) = R * cos(t)
+z(t) = pitch * t
+
+-----------------------------------------------------------
+12. GEOMETRY FOR PICO GK / LEAP71
+-----------------------------------------------------------
+
+Chamber:
+Dc = 1.3 m
+Dt = 0.198 m
+De_SL = 0.62 m
+De_VAC = 1.5 m
+
+Angles:
+theta_in = 25°
+theta_exp = 34°
+theta_exit = 10.5°
+
+Injectors:
+count = 24–36
+swirl_angle = 45°
+
+Cooling:
+channels = 120
+helix_angle = 35°
+
+Preburners:
+type = ORPB + FRPB
+geometry = toroidal manifold + cylindrical core
+
+Turbopumps:
+dual-shaft
+flow = 650 kg/s total
+
+-----------------------------------------------------------
+END OF FILE
+===========================================================
+
+EngineConfig.cs
+
+RaptorParameters.cs
+
+NozzleGeometry_Raptor3.cs
+
+ChamberFFSC_Raptor.cs
+
+Preburner_ORPB.cs
+
+Preburner_FRPB.cs
+
+Turbopump_Raptor.cs
+
+InjectorCoaxial.cs
+
+FFSC_Engine.cs
+
+Program.cs
+
+*********************************************************************************
+
+Procedimiento completo para desarrollar un motor FFSC estilo Raptor
+(con parámetros oficiales y materiales SX300/SX500)
+
+1
+Extraer parámetros oficiales del Raptor
+Start Here
+Estos parámetros son la base geométrica y termodinámica del motor FFSC.
+
+Empuje SL: 230–250 tf (Raptor 2/3)
+
+Empuje VAC: 258–275 tf
+
+Presión de cámara: 330–350 bar
+
+Isp SL: 327 s
+
+Isp VAC: 350–380 s
+
+Flujo másico total: 650 kg/s
+
+Mezcla O/F: 3.6 : 1 (78% O₂, 22% CH₄)
+
+Geometría de tobera: 34.34:1 (SL), 80:1 (VAC)
+
+
+2
+Definir geometría FFSC para PicoGK
+Geometry
+Convierte los parámetros del Raptor en perfiles Bell y cámaras FFSC.
+
+Usar ShapeKernel.CreateBellNozzleProfile(Dc, Dt, De, θ_in, θ_exp, θ_exit)
+
+Cámara: Dc=1.3 m, Dt=0.198 m
+
+Tobera SL: De=0.62 m
+
+Tobera VAC: De≈1.5 m
+
+Ángulos Bell: 25° / 34° / 10.5°
+
+Inyectores coaxiales swirl: 24–36 unidades
+
+Preburners: ORPB + FRPB
+
+Turbopumps: dual-shaft, flujo 650 kg/s
+
+3
+Integrar materiales y fabricación
+Materials
+El Raptor usa superaleaciones avanzadas y fabricación aditiva.
+
+Material = InconelSX500; NozzleThroatMaterial = UHTC;
+
+Inconel SX300/SX500 para manifolds
+
+Inconel A286 para turbobombas
+
+UHTC para garganta de tobera
+
+40% del motor impreso en 3D (inyectores, turbobombas)
+
+Aplicar metadatos de material en cada módulo
+
+4
+Construir módulos FFSC en C#
+Coding
+Cada módulo se implementa como un Task independiente.
+
+Usar GKVoxelGrid, GKBoolean.Union/Subtract, HelixHeatX.CreateHelicalChannel()
+
+BuildIgniter(): electrodos + cámara de ignición
+
+BuildPreburnerORPB(): cilindro + manifold toroidal
+
+BuildPreburnerFRPB(): geometría coaxial
+
+BuildTurbopump(): impeller NASA TM X‑419 + housing
+
+BuildCombustionChamber(): perfil Bell + lattice
+
+BuildNozzle(): tobera SL/VAC + cooling
+
+BuildCoolingChannels(): HelixHeatX helicoidal
+
+5
+Aplicar refrigeración regenerativa
+Thermal
+El Raptor usa canales helicoidales impresos en 3D.
+
+channel = HelixHeatX.CreateHelicalChannel(width, depth, helixAngle, length)
+
+Crear 120 canales helicoidales
+
+Helix angle: 35°
+
+Pitch adaptado a longitud de cámara
+
+Boolean.Subtract para vaciar canales
+
+Añadir manifold toroidal de entrada/salida
+
+6
+Añadir lattice y quasicristales
+Advanced
+Refuerzos internos tipo LEAP71 para vibración y calor.
+
+vox.Modulate(QuasicrystalField.Penrose(order, amplitude, frequency))
+
+Lattice TPMS Gyroid para paredes
+
+Quasicrystal Penrose para refuerzo stealth
+
+Aplicar Modulate() sobre el volumen
+
+Mantener espesores 2–4 mm
+
+7
+Ensamblar el motor FFSC completo
+Assembly
+Combina todos los módulos en un solo volumen voxelizado.
+
+Library.ExportMeshToStl(mesh, "FFSC_Raptor3.stl")
+
+engine.Add(Chamber)
+
+engine.Add(Nozzle)
+
+engine.Add(Preburners)
+
+engine.Add(Turbopumps)
+
+engine.Add(Injectors)
+
+engine.Subtract(CoolingChannels)
+
+Aplicar filtros: Offset ±0.003, GaussianBlur(1.0)
+
+Sources: 
+TechsightTechsight. Raptor Rocket Engine - Animated Schematic - Techsight
+*************************************************************************************
+Con este procedimiento puedes:
+
+Construir un motor FFSC estilo Raptor 3
+
+Integrar materiales SX300/SX500
+
+Añadir inyectores coaxiales swirl
+
+Crear preburners ORPB/FRPB
+
+Generar turbobombas NASA TM X‑419
+
+Aplicar lattice + quasicristales
+
+Añadir refrigeración helicoidal HelixHeatX
+
+Exportar STL/3MF para impresión 3D

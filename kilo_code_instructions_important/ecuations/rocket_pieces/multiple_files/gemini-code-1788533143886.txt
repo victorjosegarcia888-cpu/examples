@@ -1,0 +1,62 @@
+# ==========================================
+# VENUS WOVEN MONOLITH - COMPUTATIONAL NOTEBOOK
+# Framework: LEAP 71 ShapeKernel & PicoGK
+# Target Environment: VS Code / GitHub Codespace
+# ==========================================
+
+[PROJECT_METADATA]
+Name: VenusWovenShield
+Material: TaC Continuous Fibers + ZrB2-SiC-ZrC-ZrO2 UHTC Matrix
+Architecture: 3D Orthogonal Conformal TPMS Lidinoid Monolith
+
+[VARIABLES]
+- fUnitSize           : float -> Base size of the unit cell lattice.
+- m_fFrequencyScale   : float -> Internal frequency scaling factor (0.5 * 2 * PI / fUnitSize).
+- m_fWallThickness    : float -> Cartesian wall thickness of the lattice structure.
+- fGrainSizeUm        : float -> Average grain size (2.4 um for 15 vol% ZrO2, 4.0 um baseline).
+- fLocalTemperatureC  : float -> Surface temperature under reentry plasma flow (Celsius).
+- fHealingEfficiencyH : float -> Percentage of defect self-healing (0% to 100%).
+- fLengthRatio        : float -> Normalized coordinate ratio along longitudinal axis (0 to 1).
+- fRadiusRatio        : float -> Normalized radial coordinate ratio for cylindrical/lens geometries.
+
+[EQUATIONS]
+
+1. Lidinoid TPMS Signed Distance Equation (Implicit Surface):
+dX = vecPt.X, dY = vecPt.Y, dZ = vecPt.Z
+fx = m_fFrequencyScale
+
+dDist = +0.5 * (Math.Sin(2 * fx * dX) * Math.Cos(fx * dY) * Math.Sin(fx * dZ) +
+                Math.Sin(2 * fx * dY) * Math.Cos(fx * dZ) * Math.Sin(fx * dX) +
+                Math.Sin(2 * fx * dZ) * Math.Cos(fx * dX) * Math.Sin(fx * dY))
+        -0.5 * (Math.Cos(2 * fx * dX) * Math.Cos(2 * fx * dY) +
+                Math.Cos(2 * fx * dY) * Math.Cos(2 * fx * dZ) +
+                Math.Cos(2 * fx * dZ) * Math.Cos(2 * fx * dX))
+
+fFinalSignedDistance = Math.Abs(dDist) - 0.5 * m_fWallThickness
+
+2. Grain Refinement Scaling Rule:
+GrainSize = (Vol_ZrO2 >= 0.15f) ? 2.4f : 4.0f
+
+3. Multi-Stage Thermal Self-Healing Efficiency (H):
+- Region T < 800°C:
+  H = 0.0f
+- Region 1200°C (Borosilicate glass + ZrO2 skeleton phase):
+  H = 50.0f + (30.0f * Math.Min(Vol_ZrO2 / 0.15f, 1.0f))  // Max 80% for 15% ZrO2
+- Region 1400°C (Active SiC oxidation transition):
+  H = 60.0f + (40.0f * Math.Min(Vol_ZrO2 / 0.15f, 1.0f))  // Max 100% for 15% ZrO2
+- Region >= 1600°C (Complete B2O3 evaporation & Zirconia consolidation):
+  H = 100.0f
+
+4. Conformal Pipe Segment Coordinate Mapping:
+fPhiRatio    = (float)nZ / (float)m_nNumberInZ
+fLengthRatio = (float)nX / (float)m_nNumberInX
+fRadiusRatio = (float)nY / (float)m_nNumberInY
+vecPt = oSegment.vecGetSurfacePoint(fLengthRatio, fPhiRatio, fRadiusRatio)
+
+[INSTRUCTIONS_PIKOGK_LEAP71]
+1. Initialize a PicoGK library session (`PicoGK.Library.oInit()`) inside your C# console app in VS Code.
+2. Define a `BasePipeSegment` or `BaseLens` representing the rocket nose cone or skirt geometry.
+3. Instantiate `ConformalCellArray` passing the base shape and target cell counts (`nX`, `nY`, `nZ`) to map continuous fiber trajectories along the longitudinal axis.
+4. Implement `ImplicitModular` together with `ImplicitLidinoid` to generate double-walled closed structural cells without mechanical interfaces or delamination planes.
+5. Apply dynamic wall thickness modulation (`IBeamThickness`) to establish a sacrificial outer skin (1-2 mm) for high-temperature glass reflection and an internal insulated core (4 cm).
+6. Voxelize the resulting shape using PicoGK's signed distance field evaluator and export as a mesh (`Lattice` or `Implicit` boolean operations).

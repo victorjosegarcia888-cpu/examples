@@ -1,0 +1,42 @@
+Arquitectura del motor híbrido compacto (según el render)
+1 — Turbina Vectorial
+Rotor axial tipo XA103, 26 álabes, controla el vector del empuje.
+
+2 — Impulsor de Bomba
+Impulsor helicoidal criogénico estilo ASE.
+
+3 — Prequemador Toroidal
+Colector toroidal + resonador acústico.
+
+4 — Cámara de Combustión Híbrida
+Cámara regenerativa compacta tipo Noyron TKL‑200.
+
+5 — Lattice Aperiodico Interno
+Refuerzo interno tipo quasicrystal.
+
+6 — Canales Regenerativos HelixHeatX
+120 canales helicoidales regenerativos.
+
+7 — Tobera de Plasma Negra
+Tobera cerámica negra UHTC con electrodos.
+
+8 — Electrodos de Ionización
+Generación de plasma en la garganta.
+
+9 — Tobera de Escape
+Salida convergente‑divergente estilo Valox/Noyron.
+******************************************************************************************************************************************************************
+Cámara y tobera tipo Noyron TKL‑200.
+
+Turbina vectorial XA103.
+
+Prequemador toroidal ASE.
+
+Impulsor criogénico ASE.
+
+Lattice aperiodico interno.
+
+Canales regenerativos HelixHeatX.
+
+Exportación STL/3MF lista para simulación o impresión.
+********************************************************************************************************************************************************************

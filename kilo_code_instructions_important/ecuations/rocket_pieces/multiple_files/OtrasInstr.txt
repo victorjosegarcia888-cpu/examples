@@ -1,0 +1,536 @@
+1. Instrucciones generales para el agente
+El agente debe:
+
+Usar C# compatible con PicoGK
+
+Generar archivos dentro de examples/EngineFFSC/
+
+Usar geometrías de los repos Leap71:
+
+GKShape, GKMesh, GKVoxelGrid
+
+ShapeKernel.Nurbs, ShapeKernel.Surfaces, ShapeKernel.Solids
+
+LatticeBuilder, TPMS, Diamond, Gyroid
+
+QuasicrystalField, Penrose, Ammann-Beenker
+
+HelixHeatX para refrigeración helicoidal
+
+Crear Tasks modulares:
+
+BuildIgniter()
+
+BuildPreburnerORPB()
+
+BuildPreburnerFRPB()
+
+BuildTurbopump()
+
+BuildCombustionChamber()
+
+BuildNozzle()
+
+BuildCoolingChannels()
+
+AssembleEngine()
+
+Usar materiales (Inconel A286) como metadatos
+
+Exportar STL con PicoGK
+
+No usar datos operativos reales (solo geometría conceptual)
+
+Integrar PDFs NASA TM como inspiración geométrica
+
+Mantener todo dentro del repositorio examples
+
+🧱 2. Instrucciones específicas para cada repositorio Leap71
+PicoGK (núcleo geométrico)
+El agente debe usar:
+
+GKShape.Cylinder(radius, height)
+
+GKShape.Cone(r1, r2, height)
+
+GKShape.Sphere(radius)
+
+GKShape.Box(size)
+
+GKMesh para superficies
+
+GKVoxelGrid(resolution) para voxelizar turbobombas y cámaras
+
+GKExport.SaveSTL(shape, filename)
+
+PicoGK.Geometry (geometría avanzada)
+El agente debe usar:
+
+GKCurve para trayectorias de igniter
+
+GKExtrude para crear canales
+
+GKLoft para transiciones cámara → tobera
+
+GKBoolean.Union/Subtract/Intersect
+
+LEAP71_ShapeKernel (superficies paramétricas)
+El agente debe usar:
+
+Nurbs.CreateCylinder()
+
+Nurbs.CreateCone()
+
+Nurbs.CreateTorus()
+
+Nurbs.CreateHelix()
+
+Surfaces.Offset()
+
+Solids.Thicken()
+
+LEAP71_LatticeLibrary (rejillas internas)
+El agente debe usar:
+
+LatticeBuilder.WithCellSize()
+
+LatticeBuilder.WithPattern(LatticePattern.Diamond)
+
+LatticeBuilder.WithTPMS(TPMS.Gyroid)
+
+ApplyTo(shape)
+
+Para:
+
+Cámara FFSC
+
+Tobera
+
+Carcasa de turbobomba
+
+LEAP71_QuasiCrystals (estructuras avanzadas)
+El agente debe usar:
+
+QuasicrystalField.Penrose()
+
+QuasicrystalField.AmmannBeenker()
+
+ApplyToVolume(voxelGrid)
+
+Para:
+
+Refuerzos internos
+
+Zonas de alta temperatura
+
+Estructuras anti-vibración
+
+LEAP71_HelixHeatX (refrigeración helicoidal)
+El agente debe usar:
+
+HelixHeatX.CreateChannel(radius, pitch, turns)
+
+HelixHeatX.ApplyTo(chamber)
+
+Para:
+
+Refrigeración de cámara
+
+Refrigeración de tobera
+
+Refrigeración de prequemador
+
+PicoGK_Examples (referencias de estilo)
+El agente debe seguir:
+
+Estructura de Tasks
+
+Uso de Library.Go()
+
+Exportación STL
+
+Organización modular
+
+🔥 3. Instrucciones para generar módulos FFSC
+El agente debe crear:
+
+Igniter (vectorial + ShapeKernel)
+Trayectorias con GKCurve
+
+Electrodos con Nurbs.CreateCylinder()
+
+Cámara de ignición con GKShape.Sphere()
+
+Canales coaxiales con GKExtrude
+
+Prequemadores ORPB/FRPB
+Cuerpo cilíndrico con Nurbs.CreateCylinder()
+
+Inyectores coaxiales con GKExtrude
+
+Manifold con GKLoft
+
+Refrigeración con HelixHeatX
+
+Turbobomba (voxel + lattice)
+Housing con GKShape.Cylinder()
+
+Impeller con GKShape.Disk()
+
+Voxelización con GKVoxelGrid(512)
+
+Rejilla interna con LatticeBuilder
+
+Refuerzos con QuasicrystalField
+
+Cámara FFSC (lattice + helix cooling)
+Geometría con Nurbs.CreateCone()
+
+Rejilla interna con LatticeBuilder
+
+Refrigeración helicoidal con HelixHeatX
+
+Voxelización opcional
+
+Tobera (paramétrica)
+Perfil con GKCurve
+
+Loft con GKLoft
+
+Lattice opcional
+
+Refrigeración helicoidal
+
+Ensamblaje completo
+Transformaciones con GKTransform.Translate/Rotate
+
+Unión con GKBoolean.Union()
+
+Exportación STL
+
+🧩 4. Instrucciones para Program.cs
+El agente debe generar:
+
+csharp
+using PicoGK;
+using EngineFFSC;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        FFSC_Engine engine = new FFSC_Engine();
+
+        engine.BuildIgniter();
+        engine.BuildPreburners();
+        engine.BuildTurbopumps();
+        engine.BuildCombustionChamber();
+        engine.BuildNozzle();
+        engine.BuildCoolingChannels();
+
+        engine.Assemble();
+        engine.Export("FFSC_engine_full.stl");
+    }
+}
+🧬 5. Instrucciones para carpetas y archivos
+El agente debe crear:
+
+Código
+examples/EngineFFSC/Igniters/*.cs
+examples/EngineFFSC/Preburners/*.cs
+examples/EngineFFSC/Turbopumps/*.cs
+examples/EngineFFSC/CombustionChamber/*.cs
+examples/EngineFFSC/Materials/*.cs
+examples/EngineFFSC/Geometry/*.cs
+examples/EngineFFSC/EngineAssembly/*.cs
+Program.cs
+🎯 6. ¿Quieres que genere ahora todos los archivos .cs completos?
+Puedo generar:
+
+IgniterVectorModel.cs
+
+IgniterVoxelModel.cs
+
+PreburnerGeometry.cs
+
+ORPBModel.cs
+
+FRPBModel.cs
+
+TurbopumpVoxelModel.cs
+
+ChamberGrid.cs
+
+NozzleGeometry.cs
+
+InconelA286.cs
+
+LatticeEngine.cs
+
+QuasicrystalStructures.cs
+
+HelixCooling.cs
+
+FFSC_Engine.cs
+
+Program.cs
+
+Solo dime:
+
+👉 ¿Quieres que genere todos los archivos .cs ahora mismo?
+
+me gusta como enfocas la estructura, podria ser mas grande y precisa?
+Víctor, claro que sí.
+Puedo hacer la estructura mucho más grande, más precisa, más modular, más profesional, y totalmente adaptada a cómo funcionan PicoGK, PicoGK.Geometry, ShapeKernel, LatticeLibrary, QuasiCrystals, HelixHeatX, y tu repositorio victorjosegarcia888-cpu/examples.
+
+Lo que te voy a entregar ahora es la versión MAXIMIZADA, pensada para un proyecto FFSC de escala industrial, con una arquitectura que permite:
+
+crecer sin límites,
+
+añadir módulos nuevos sin romper nada,
+
+ejecutar tasks independientes,
+
+integrar geometría paramétrica, vóxeles, lattices, quasicristales, refrigeración helicoidal,
+
+y mantener todo ordenado para que los agentes puedan trabajar automáticamente.
+
+Esta es la estructura definitiva, la que usaría un equipo de ingeniería de SpaceX o Blue Origin si estuviera trabajando con PicoGK.
+
+🧩 ARQUITECTURA GIGANTE Y PRECISA PARA TU REPOSITORIO FFSC
+La estructura está pensada para:
+
+motores FFSC completos,
+
+submódulos independientes,
+
+agentes automáticos,
+
+PicoGK + ShapeKernel + Lattice + QuasiCrystals + HelixHeatX,
+
+código limpio y escalable,
+
+Tasks para Codespaces,
+
+motor grande (full-scale).
+
+📁 1. Estructura raíz del repositorio
+Código
+examples/
+│
+├── EngineFFSC/
+│   ├── Core/
+│   │   ├── EngineConfig.cs
+│   │   ├── EngineScale.cs
+│   │   ├── EngineMaterials.cs
+│   │   ├── EngineConstants.cs
+│   │   ├── EnginePaths.cs
+│   │   └── EngineTaskBase.cs
+│   │
+│   ├── Geometry/
+│   │   ├── GKPrimitives/
+│   │   │   ├── GK_Cylinders.cs
+│   │   │   ├── GK_Cones.cs
+│   │   │   ├── GK_Spheres.cs
+│   │   │   ├── GK_Tubes.cs
+│   │   │   └── GK_BooleanOps.cs
+│   │   ├── ShapeKernel/
+│   │   │   ├── SK_Nurbs.cs
+│   │   │   ├── SK_Surfaces.cs
+│   │   │   ├── SK_Solids.cs
+│   │   │   └── SK_ParametricProfiles.cs
+│   │   ├── Lattice/
+│   │   │   ├── Lattice_Diamond.cs
+│   │   │   ├── Lattice_Gyroid.cs
+│   │   │   ├── Lattice_TPMS.cs
+│   │   │   └── Lattice_Apply.cs
+│   │   ├── Quasicrystals/
+│   │   │   ├── QC_Penrose.cs
+│   │   │   ├── QC_AmmannBeenker.cs
+│   │   │   └── QC_Apply.cs
+│   │   ├── HelixHeatX/
+│   │   │   ├── HHX_Channel.cs
+│   │   │   ├── HHX_Apply.cs
+│   │   │   └── HHX_Manifold.cs
+│   │   └── Voxel/
+│   │       ├── VoxelGrid.cs
+│   │       ├── VoxelOps.cs
+│   │       └── VoxelExport.cs
+│   │
+│   ├── Igniters/
+│   │   ├── IgniterVectorModel.cs
+│   │   ├── IgniterVoxelModel.cs
+│   │   ├── IgniterGeometry.cs
+│   │   └── IgniterTask.cs
+│   │
+│   ├── Preburners/
+│   │   ├── ORPBGeometry.cs
+│   │   ├── FRPBGeometry.cs
+│   │   ├── PreburnerManifold.cs
+│   │   ├── PreburnerCooling.cs
+│   │   └── PreburnerTask.cs
+│   │
+│   ├── Turbopumps/
+│   │   ├── TurbopumpHousing.cs
+│   │   ├── TurbopumpImpeller.cs
+│   │   ├── TurbopumpVoxelModel.cs
+│   │   ├── TurbopumpCavitation.cs
+│   │   └── TurbopumpTask.cs
+│   │
+│   ├── CombustionChamber/
+│   │   ├── ChamberGeometry.cs
+│   │   ├── ChamberLattice.cs
+│   │   ├── ChamberCooling.cs
+│   │   ├── ChamberChemistry.cs
+│   │   └── ChamberTask.cs
+│   │
+│   ├── Nozzle/
+│   │   ├── NozzleParametric.cs
+│   │   ├── NozzleLattice.cs
+│   │   ├── NozzleCooling.cs
+│   │   └── NozzleTask.cs
+│   │
+│   ├── EngineAssembly/
+│   │   ├── EngineIntegrator.cs
+│   │   ├── EngineTransform.cs
+│   │   ├── EngineExport.cs
+│   │   └── EngineTask.cs
+│   │
+│   └── Tasks/
+│       ├── Task_Igniter.cs
+│       ├── Task_Preburner.cs
+│       ├── Task_Turbopump.cs
+│       ├── Task_Chamber.cs
+│       ├── Task_Nozzle.cs
+│       ├── Task_FullEngine.cs
+│       └── Task_All.cs
+│
+└── Program.cs
+🧬 2. Precisión extrema: qué hace cada carpeta
+Core/
+Base del motor FFSC:
+
+Configuración global
+
+Escala del motor
+
+Materiales (Inconel A286, Hastelloy, Monel, etc.)
+
+Paths de exportación
+
+Clase base para Tasks
+
+Geometry/
+Aquí vive toda la geometría:
+
+GKPrimitives/
+Cilindros, conos, esferas, booleanos
+
+Vóxeles base
+
+Extrusiones
+
+ShapeKernel/
+Nurbs
+
+Superficies paramétricas
+
+Sólidos paramétricos
+
+Perfiles de cámara y tobera
+
+Lattice/
+Diamond
+
+Gyroid
+
+TPMS
+
+Aplicación a volúmenes
+
+Quasicrystals/
+Penrose
+
+Ammann-Beenker
+
+Aplicación a estructuras internas
+
+HelixHeatX/
+Canales helicoidales
+
+Manifolds
+
+Refrigeración regenerativa
+
+Voxel/
+Grids
+
+Operaciones
+
+Exportación
+
+Igniters/
+Igniter vectorial + igniter voxelizado + igniter paramétrico.
+
+Preburners/
+ORPB + FRPB + manifold + refrigeración helicoidal.
+
+Turbopumps/
+Housing + impeller + cavitación + voxelización.
+
+CombustionChamber/
+Cámara FFSC + lattice + refrigeración + química.
+
+Nozzle/
+Tobera paramétrica + lattice + refrigeración helicoidal.
+
+EngineAssembly/
+Integración completa del motor:
+
+Transformaciones
+
+Unión de geometrías
+
+Exportación STL
+
+Tasks/
+Tasks independientes para Codespaces:
+
+Igniter
+
+Preburner
+
+Turbopump
+
+Cámara
+
+Tobera
+
+Motor completo
+
+Task global
+
+🔥 3. Precisión máxima: cómo trabajan los agentes
+Los agentes deben:
+
+Usar PicoGK para vóxeles y booleanos
+
+Usar ShapeKernel para geometría paramétrica
+
+Usar LatticeLibrary para rejillas internas
+
+Usar QuasiCrystals para refuerzos avanzados
+
+Usar HelixHeatX para refrigeración helicoidal
+
+Exportar STL con GKExport
+
+Crear Tasks modulares
+
+Mantener todo dentro de examples/EngineFFSC/
+
+No usar datos operativos reales
+
+Solo geometría conceptual
+
+Integrar PDFs NASA TM como inspiración geométrica
