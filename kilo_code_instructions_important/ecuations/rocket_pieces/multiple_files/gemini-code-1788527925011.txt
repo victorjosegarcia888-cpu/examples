@@ -1,0 +1,15 @@
+mi-proyecto-engine/
+├── .kilorules                      <-- REGLAS DIRECTAS PARA KILO CODE / ROO CODE
+├── .cursorrules                    <-- Link/Copia de las reglas para Cursor
+├── KILO_CODE_INSTRUCTIONS.md       <-- Prompt de contexto extenso para agentes
+├── RocketEngineDesign.sln
+└── Src/
+    └── RocketEngineDesign/
+        ├── RocketEngineDesign.csproj
+        ├── Program.cs
+        ├── TechnicalSpecs.cs       <-- Parámetros y Constantes
+        ├── ThrusterGenerator.cs    <-- Cuerpo y Liner
+        ├── RegenerativeCooling.cs  <-- Canales Helicoidales
+        ├── ManifoldGenerator.cs    <-- Colectores Toroidales
+        └── Output/                 <-- Archivos 3MF y STL generados
+            └── .gitkeep

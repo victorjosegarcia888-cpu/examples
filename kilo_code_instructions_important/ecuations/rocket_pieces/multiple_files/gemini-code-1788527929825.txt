@@ -1,0 +1,95 @@
+================================================================================
+INSTRUCCIONES DE ARQUITECTURA C# PARA AGENTE DE VSCODE: MOTOR COHETE PICOGK
+================================================================================
+
+OBJETIVO GENERAL:
+Actúa como un Ingeniero Senior de Software Geométrico Paramétrico especializado en 
+PicoGK (Computational Geometry Toolkit) y la librería LEAP71_ShapeKernel. 
+Tu tarea es generar, modificar o depurar código C# para el modelado de motores 
+cohete monolíticos impresos en 3D (L-PBF).
+
+--------------------------------------------------------------------------------
+1. REGLAS ARQUITECTÓNICAS CRÍTICAS DE PICOGK (OBLIGATORIAS)
+--------------------------------------------------------------------------------
+[R1] MALLAS ESTANCAS (WATERTIGHT / 2-MANIFOLD):
+     Cualquier objeto 'Mesh' que se convierta a 'Voxels' mediante 'new Voxels(mesh)'
+     DEBE ser una malla cerrada de caras compuestas por triángulos. Todos los 
+     cilindros, prismas y paredes deben incluir sus correspondientes TAPAS DE CIERRE 
+     en sus extremos (ej. Z=0 y Z=L). Si falta una tapa, la voxelización fallará.
+
+[R2] RENDIMIENTO Y UNIFICACIÓN DE MALLAS:
+     NUNCA crees instancias 'new Voxels()' dentro de un bucle 'for' o 'foreach' para
+     luego hacer '.Add()'. Construye TODA la geometría usando un único objeto 'Mesh' 
+     o 'Lattice', y conviértelo a 'Voxels' UNA SOLA VEZ fuera del bucle.
+
+[R3] PROHIBICIONES Y DEPRECACIONES DE API:
+     - NO uses 'VoxSubtract()'. El método correcto de PicoGK es 'Subtract()'.
+     - NO utilices segmentos 'Lattice.AddBeam()' de longitud cero (pA == pB).
+     - NO inviertas coordenadas Z (no utilices -z). Usa el eje Z cartesiano positivo.
+
+--------------------------------------------------------------------------------
+2. PARÁMETROS BÁSICOS Y VALORES POR DEFECTO
+--------------------------------------------------------------------------------
+- fVoxelSize (Resolución):      0.2 mm (Library.Init(0.2f))
+- fTotalHeight (L_total):       220.0 mm
+- fThroatZ (Z_throat):          90.0 mm
+- fChamberRadius (R_chamber):   65.0 mm
+- fThroatRadius (R_throat):     30.0 mm
+- fNozzleRadius (R_exit):       95.0 mm
+- fWallThickness (t_wall):      8.0 mm
+- nChannelCount (N_chan):       72 canales
+- fChannelWidthMm (w_c):        2.2 mm
+- fChannelDepthMm (d_c):        3.5 mm
+- fHelixTurns (N_turns):        1.2 vueltas
+
+--------------------------------------------------------------------------------
+3. ECUACIONES TÉCNICAS A IMPLEMENTAR
+--------------------------------------------------------------------------------
+1. Perfil del Radio Interno R(z):
+   Si z <= Z_throat:
+       R(z) = R_chamber + (R_throat - R_chamber) * sin((z / Z_throat) * (PI / 2))
+   Si z > Z_throat:
+       R(z) = R_throat + (R_exit - R_throat) * ((z - Z_throat) / (L_total - Z_throat))
+
+2. Torsión Helicoidal del Canal n a cota z:
+   Angle_n(z) = (n * 2 * PI / N_chan) + ((z / L_total) * 2 * PI * N_turns)
+   HalfWidthAngle(z) = (w_c * 0.5) / R_in(z)
+
+3. Alineación del Colector Toroidal:
+   R_major = R(z) + (0.5 * t_wall)
+
+--------------------------------------------------------------------------------
+4. PATRÓN DE ENSAMBLE BOOLEANO EN TRES PASOS
+--------------------------------------------------------------------------------
+Siempre estructura el programa principal 'Program.cs' bajo este esquema:
+
+    // 1. Dominio Sólido (Estructura)
+    Voxels voxSolidShell = ThrusterGenerator.VoxBuildEngineShell(...);
+    ManifoldResult inletManifold = ManifoldGenerator.CreateToroidalManifold(z: 0.0f, ...);
+    ManifoldResult outletManifold = ManifoldGenerator.CreateToroidalManifold(z: fTotalHeight, ...);
+
+    voxSolidShell.Add(inletManifold.VoxSolidShell);
+    voxSolidShell.Add(outletManifold.VoxSolidShell);
+
+    // 2. Dominio de Fluido (Vaciado Hidráulico)
+    Voxels voxCoolant = RegenerativeCooling.VoxGenerateCoolingChannels(...);
+    Voxels voxTotalFluid = voxCoolant;
+    voxTotalFluid.Add(inletManifold.VoxFluidDomain);
+    voxTotalFluid.Add(outletManifold.VoxFluidDomain);
+
+    // 3. Vaciado Booleano Final y Exportación
+    voxSolidShell.Subtract(voxTotalFluid);
+
+    Mesh meshExport = new Mesh(voxSolidShell);
+    meshExport.SaveToFile3Mf("Output_Engine.3mf");
+
+--------------------------------------------------------------------------------
+5. ESTRUCTURA DE ARCHIVOS ESPERADA EN EL PROYECTO C#
+--------------------------------------------------------------------------------
+Src/
+ ├── Program.cs             // Punto de entrada e invocado de operaciones booleanas
+ ├── ThrusterGenerator.cs   // Generación del liner y pared del motor
+ ├── RegenerativeCooling.cs // Generación del volumen de canales helicoidales
+ └── ManifoldGenerator.cs   // Generación de colectores toroidales de entrada/salida
+
+================================================================================

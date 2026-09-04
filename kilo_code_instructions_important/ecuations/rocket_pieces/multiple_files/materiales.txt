@@ -1,0 +1,110 @@
+Cómo integrar fabricación y materiales del Raptor en tus scripts FFSC
+1
+Clasificar componentes según método de fabricación
+Start Here
+Separar qué piezas del motor deben ser impresas en 3D y cuáles deben ser fundidas en Inconel SX300/SX500.
+
+Impresión 3D (40% del motor): turbobombas, inyectores, manifolds pequeños
+
+Fundición Inconel SX300/SX500: colectores grandes, carcasa de cámara, tobera
+
+UHTC: garganta de tobera y zonas de plasma
+
+Crear listas en /Materials/ManufacturingMap.cs
+
+2
+Asignar materiales a cada módulo FFSC
+Recommended
+Cada módulo debe incluir metadatos de material para simulación térmica y estructural.
+
+Turbobomba → Inconel A286
+
+Manifolds → Inconel SX300/SX500
+
+Inyectores → Inconel SX500 + impresión 3D
+
+Cámara → Inconel SX300 + lattice interno
+
+Tobera → UHTC + canales helicoidales
+
+Añadir clase MaterialSpec.cs con propiedades
+
+3
+Definir geometrías imprimibles (3D printed)
+Geometry
+Las piezas impresas deben ser voxelizadas y permitir booleanos complejos.
+
+Turbobomba: usar GKVoxelGrid(512)
+
+Inyectores: usar HelixHeatX.CreateHelicalChannel()
+
+Manifolds: usar GKLoft + GKBoolean.Union
+
+Exportar como STL para impresión
+
+4
+Definir geometrías fundidas (cast Inconel SX300/SX500)
+Critical
+Las piezas fundidas deben ser superficies paramétricas sin lattice interno.
+
+Cámara FFSC: Nurbs.CreateCone() + Surfaces.Offset()
+
+Tobera: ShapeKernel.CreateBellNozzleProfile() + SweepProfile()
+
+Colectores toroidales: Nurbs.CreateTorus()
+
+Exportar como malla cerrada (watertight)
+
+5
+Integrar lattice y quasicristales en zonas impresas
+Advanced
+El Raptor usa estructuras internas complejas para reducir masa y mejorar disipación.
+
+Cámara: LatticeBuilder.WithTPMS(Gyroid)
+
+Tobera: QuasicrystalField.AmmannBeenker()
+
+Manifolds: Diamond lattice
+
+Aplicar con ApplyToVolume(voxGrid)
+
+6
+Aplicar canales regenerativos helicoidales
+Cooling
+El Raptor usa refrigeración regenerativa en cámara y tobera.
+
+Usar HelixHeatX.CreateChannel(radius, pitch, turns)
+
+Cámara: 120 canales helicoidales
+
+Tobera: canales más finos, pitch reducido
+
+Restar canales del sólido con vox.Subtract()
+
+7
+Generar metadatos de fabricación para agentes
+Automation
+Los agentes KiloCode deben saber cómo generar cada módulo.
+
+Crear archivo /Specs/RaptorManufacturing.txt
+
+Incluir: método de fabricación, material, resolución, lattice, cooling
+
+Los agentes usarán este archivo para generar .cs automáticamente
+
+8
+Integrar todo en Program.cs
+Assembly
+Combinar todos los módulos en un motor FFSC completo.
+
+engine.Add(BuildTurbopump())
+
+engine.Add(BuildPreburners())
+
+engine.Add(BuildChamber())
+
+engine.Add(BuildNozzle())
+
+engine.Subtract(BuildCoolingChannels())
+
+Exportar con Library.ExportMeshToStl()

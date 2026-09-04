@@ -1,0 +1,226 @@
+===========================================================
+SPACE X RAPTOR ENGINE — FULL PARAMETER & GEOMETRY SPEC
+===========================================================
+
+SOURCE: Wikipedia Raptor Engine + linked technical references
+Propellant: LOX / CH4 (Methalox)
+Cycle: Full-Flow Staged Combustion (FFSC)
+Preburners: 2 (Fuel-Rich + Oxidizer-Rich)
+Turbopumps: Dual-shaft, independent
+
+-----------------------------------------------------------
+1. MIXTURE RATIO (O/F)
+-----------------------------------------------------------
+O/F ratio = 3.6 : 1
+Oxygen mass fraction = 78%
+Methane mass fraction = 22%
+
+Use in scripts:
+OF = 3.6
+fuel_fraction = 0.22
+ox_fraction = 0.78
+
+-----------------------------------------------------------
+2. CHAMBER PRESSURE
+-----------------------------------------------------------
+Raptor 1: 300 bar
+Raptor 2: 330 bar
+Raptor 3: 330–350 bar
+
+Use in FFSC geometry:
+Pc = 330e5 Pa
+
+-----------------------------------------------------------
+3. THRUST (SEA LEVEL / VACUUM)
+-----------------------------------------------------------
+Raptor 1:
+  SL: 185 tf (1814 kN)
+  VAC: 258 tf (2530 kN)
+
+Raptor 2:
+  SL: 230 tf (2256 kN)
+  VAC: 258 tf (2530 kN)
+
+Raptor 3:
+  SL: 250 tf (2452 kN)
+  VAC: 275 tf (2697 kN)
+
+Throttle range: 40–100%
+
+-----------------------------------------------------------
+4. SPECIFIC IMPULSE (ISP)
+-----------------------------------------------------------
+Sea Level: 327 s
+Vacuum (SL nozzle): 350 s
+Vacuum (Vac nozzle): 380 s
+
+Use in scripts:
+Isp_SL = 327
+Isp_VAC = 350
+Isp_VAC_opt = 380
+
+-----------------------------------------------------------
+5. MASS FLOW RATE
+-----------------------------------------------------------
+Total: ~650 kg/s
+Oxygen: ~510 kg/s
+Methane: ~140 kg/s
+
+Use in FFSC equations:
+mdot_total = 650
+mdot_ox = 510
+mdot_fuel = 140
+
+-----------------------------------------------------------
+6. GEOMETRY — NOZZLE EXPANSION RATIOS
+-----------------------------------------------------------
+Sea Level Nozzle: 34.34 : 1
+Vacuum Nozzle: 80 : 1
+
+Use for PicoGK Bell profile:
+theta_in = 25°
+theta_exp = 34°
+theta_exit = 10.5°
+
+-----------------------------------------------------------
+7. DIMENSIONS
+-----------------------------------------------------------
+Length: 3.1 m
+Diameter: 1.3 m
+
+Use in scripts:
+engine_length = 3.1
+engine_diameter = 1.3
+
+-----------------------------------------------------------
+8. DRY MASS
+-----------------------------------------------------------
+Raptor 1: 2080 kg
+Raptor 2: 1630 kg
+Raptor 3: 1525 kg
+
+-----------------------------------------------------------
+9. MATERIALS
+-----------------------------------------------------------
+Inconel SX300 / SX500 (manifolds)
+Inconel A286 (turbomachinery)
+UHTC (nozzle throat)
+3D printed structures (40% mass in early prototypes)
+
+-----------------------------------------------------------
+10. FFSC GEOMETRY NOTES
+-----------------------------------------------------------
+- Both propellants arrive as hot gas → better mixing
+- Preburners reduce turbine temperature
+- Dual turbopumps reduce cavitation risk
+- Subcooled propellants increase density
+- Coaxial swirl injector (24–36 injectors)
+- Regenerative cooling in chamber + nozzle
+
+-----------------------------------------------------------
+11. EQUATIONS FOR SCRIPTING
+-----------------------------------------------------------
+
+(1) Mass flow split:
+mdot_total = mdot_ox + mdot_fuel
+
+(2) Mixture ratio:
+O/F = mdot_ox / mdot_fuel = 3.6
+
+(3) Chamber pressure:
+Pc = 330e5 Pa
+
+(4) Thrust:
+F = mdot_total * Ve + (Pe - Pa) * Ae
+
+(5) Specific impulse:
+Isp = Ve / g0
+
+(6) Bell nozzle profile:
+R(x) = a0 + a1*x + a2*x^2 + a3*x^3
+
+(7) Cooling channel helix:
+r(t) = R * cos(t)
+z(t) = pitch * t
+
+-----------------------------------------------------------
+12. GEOMETRY FOR PICO GK / LEAP71
+-----------------------------------------------------------
+
+Chamber:
+Dc = 1.3 m
+Dt = 0.198 m
+De_SL = 0.62 m
+De_VAC = 1.5 m
+
+Angles:
+theta_in = 25°
+theta_exp = 34°
+theta_exit = 10.5°
+
+Injectors:
+count = 24–36
+swirl_angle = 45°
+
+Cooling:
+channels = 120
+helix_angle = 35°
+
+Preburners:
+type = ORPB + FRPB
+geometry = toroidal manifold + cylindrical core
+
+Turbopumps:
+dual-shaft
+flow = 650 kg/s total
+
+-----------------------------------------------------------
+13. INSTRUCTIONS FOR DEVELOPING THE SCRIPT (.cs)
+-----------------------------------------------------------
+
+1. Create folder:
+   examples/EngineFFSC/
+
+2. Create files:
+   RaptorParameters.cs
+   ChamberFFSC_Raptor.cs
+   Nozzle_Raptor3.cs
+   Preburner_ORPB.cs
+   Preburner_FRPB.cs
+   Turbopump_Raptor.cs
+   InjectorCoaxial.cs
+   CoolingHelix.cs
+   FFSC_Engine.cs
+   Program.cs
+
+3. Use libraries:
+   PicoGK
+   LEAP71.ShapeKernel
+   LEAP71.LatticeLibrary
+   LEAP71.QuasiCrystals
+   LEAP71.HelixHeatX
+
+4. Build geometry:
+   - Bell nozzle profile using CreateBellNozzleProfile()
+   - Sweep with SweepProfile()
+   - Add cooling channels with HelixHeatX.CreateHelicalChannel()
+   - Add lattice with QuasicrystalField()
+   - Add injectors with coaxial swirl geometry
+   - Add preburners with toroidal manifold
+   - Add turbopump with helical inducer NASA TM X‑419
+
+5. Assemble engine:
+   engine.Add(Chamber)
+   engine.Add(Nozzle)
+   engine.Add(Preburners)
+   engine.Add(Turbopumps)
+   engine.Add(Injectors)
+   engine.Subtract(CoolingChannels)
+
+6. Export:
+   Library.ExportMeshToStl()
+   Library.ExportMeshTo3MF()
+
+-----------------------------------------------------------
+END OF FILE
+===========================================================

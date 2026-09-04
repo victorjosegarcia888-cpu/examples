@@ -1,0 +1,136 @@
+02
+Configurar proyecto FFSC
+Recommended
+Estructura el repositorio para soportar motor completo FFSC.
+
+Crear carpetas: /Igniters, /Preburners, /Turbopumps, /CombustionChamber, /Materials, /EngineAssembly
+
+Añadir referencias en .csproj a PicoGK, ShapeKernel, Lattice, Quasicrystals
+
+Crear archivo program.cs con selector de Tasks
+
+Añadir clase global EngineScale para escalar geometría
+
+03
+Diseñar Igniter vectorial
+Genera igniter FFSC usando vectores y volúmenes simples.
+
+IgniterVectorModel.cs → Build()
+
+Crear vectores de entrada de fuel y oxidante
+
+Crear volumen de ignición (cilindro + esfera)
+
+Añadir canales internos como líneas o cilindros
+
+Exportar STL o VDB para visualización
+
+04
+Construir geometría de Prequemador (ORPB/FRPB)
+Modela prequemadores FFSC con ShapeKernel y vectores.
+
+PreburnerGeometry.cs → Build(r, L)
+
+Crear cilindro principal del prequemador
+
+Añadir puertos de entrada desde igniter
+
+Añadir puertos de salida hacia turbobombas
+
+Añadir eje interno para turbina
+
+Integrar metadatos de material Inconel A286
+
+05
+Generar turbobomba voxelizada
+Crea turbobomba conceptual usando vóxeles y vectores.
+
+TurbopumpVoxelModel.cs → Build(size)
+
+Crear housing cilíndrico
+
+Crear impeller como disco + álabes voxelizados
+
+Añadir canales de entrada/salida como vectores
+
+Añadir cavitation model (NASA TM)
+
+Exportar volumen voxelizado
+
+06
+Construir cámara de combustión con rejilla interna
+Genera cámara FFSC con lattice y quasicrystals.
+
+ChamberGrid.cs → Initialize(N)
+
+Crear cono convergente-divergente con ShapeKernel
+
+Aplicar lattice volumétrico en paredes
+
+Añadir canales de refrigeración
+
+Añadir campo térmico y presión (ChamberGrid)
+
+Integrar química FFSC (ChamberChemistry)
+
+07
+Diseñar tobera paramétrica
+Modela tobera FFSC con expansión controlada.
+
+NozzleGeometry.cs → Area(x)
+
+Definir radio de garganta
+
+Definir relación de expansión
+
+Crear geometría paramétrica con ShapeKernel
+
+Integrar con cámara de combustión
+
+08
+Integrar materiales (Inconel A286)
+Añade propiedades de material a cada módulo FFSC.
+
+InconelA286.cs → propiedades
+
+Crear clase InconelA286
+
+Añadir densidad, resistencia, temperatura máxima
+
+Asociar material a igniter, prequemador, turbina, cámara
+
+Usar solo como metadatos, no como cálculo operativo
+
+09
+Ensamblar motor FFSC completo
+Combina todos los módulos en un solo modelo.
+
+FFSC_Engine.cs → Build()
+
+Igniter → Prequemadores → Turbopump → Cámara → Tobera
+
+Usar transformaciones para posicionar cada módulo
+
+Unir geometrías con .Union()
+
+Exportar FFSC_engine_full.stl
+
+10
+Crear Tasks para agentes
+Define tareas automáticas para scripts, agentes o pipelines.
+
+program.cs → switch(taskName)
+
+TaskIgniter
+
+TaskPreburner
+
+TaskTurbopump
+
+TaskChamber
+
+TaskNozzle
+
+TaskEngineAssembly
+
+Añadir selector en program.cs

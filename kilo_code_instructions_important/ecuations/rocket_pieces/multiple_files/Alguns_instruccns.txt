@@ -1,0 +1,126 @@
+/engine-hybrid-compact/
+│
+├── src/
+│   ├── EngineTasks.cs
+│   ├── Program.cs
+│   ├── ThrusterGenerator.cs
+│   ├── RegenerativeCooling.cs
+│   ├── HighPressureDucts.cs
+│   ├── ManifoldGenerator.cs
+│   ├── NozzleGenerator.cs
+│   └── Materials/
+│       ├── UHTC.cs
+│       ├── Inconel.cs
+│       └── NanoDB.cs
+│
+├── libs/
+│   ├── LEAP71_ShapeKernel/
+│   ├── LEAP71_HelixHeatX/
+│   ├── LEAP71_QuasiCrystals/
+│   ├── LEAP71_LatticeLibrary/
+│   └── PicoGK/
+│
+├── .devcontainer/
+│   ├── devcontainer.json
+│   └── Dockerfile
+│
+├── .vscode/
+│   ├── settings.json
+│   ├── extensions.json
+│   └── launch.json
+│
+└── README.md
+***************************************************************************************************************************************************
+Procedimiento completo para generar piezas mecánicas con PicoGK y ensamblar un motor híbrido compacto
+1
+Configurar Codespaces para PicoGK y LEAP71
+Setup
+Prepara el entorno para compilar geometrías voxelizadas y módulos LEAP71.
+Crea un Codespace desde tu repo victorjosegarcia888-cpu/examples
+Añade .devcontainer/devcontainer.json con .NET + Rust + utilidades
+Instala extensiones: KiloCode, Copilot, C#, Rust Analyzer
+Clona repos LEAP71 en /libs/ (ShapeKernel, HelixHeatX, QuasiCrystals, LatticeLibrary, PicoGK)
+
+2
+Crear estructura del proyecto
+Recommended
+Organiza el proyecto para que cada pieza del motor sea un módulo independiente.
+Crea carpeta /src/
+Añade archivos: EngineTasks.cs, Program.cs, ThrusterGenerator.cs, RegenerativeCooling.cs, HighPressureDucts.cs, ManifoldGenerator.cs, NozzleGenerator.cs
+Crea carpeta /src/Materials/ para UHTC, Inconel, NanoDB
+Configura .vscode/settings.json para que KiloCode Agents apunten a /src/
+
+3
+Generar piezas mecánicas con PicoGK
+Geometry
+Cada pieza del motor se genera como un volumen voxelizado usando Mesh → Voxels.
+Usa Mesh para crear geometrías cerradas (watertight)
+Convierte a Voxels(mesh) para booleanos
+Genera piezas: turbina XA103, impulsor NASA TM X‑419, cámara Noyron TKL‑200, tobera parabólica Rao, canales HelixHeatX, lattice aperiodico
+Guarda cada pieza como una función en EngineTasks.cs
+
+4
+Construir la cámara y tobera compacta
+Critical
+La cámara y tobera son el núcleo del motor; deben ser estancas y regenerativas.
+Usa ThrusterGenerator.VoxBuildEngineShell() para pared interna/externa
+Añade tapas Z=0 y Z=L para evitar fugas
+Genera canales helicoidales con RegenerativeCooling.VoxGenerateCoolingChannels()
+Realiza voxShell.Subtract(voxChannels) para refrigeración regenerativa
+Aplica materiales UHTC‑Inconel en /src/Materials/
+
+5
+Crear turbobomba criogénica NASA TM X‑419
+Engineering
+Basada en el documento NASA TM X‑419 que compartiste.
+Genera impulsor helicoidal con ángulo 83°
+Usa ShapeKernel.CreateHelicalBlade()
+Añade hub y vaciado interno
+Ensambla en EngineTasks.Task_GenerateFuelPumpImpeller()
+
+6
+Construir tuberías internas y colectores toroidales
+Fluid System
+Las tuberías internas deben ser Inconel y los colectores toroidales deben conectar los canales.
+Usa HighPressureDucts.VoxGenerateDucts() para tuberías
+Usa ManifoldGenerator.CreateToroidalManifold() para colectores
+Conecta canales HelixHeatX a colectores mediante booleanos
+Añade bellows para absorción térmica
+
+7
+Ensamblar el motor completo en Program.cs
+Assembly
+Combina todas las piezas en un solo volumen voxelizado.
+Crea var engine = new Voxels(0.25)
+Añade piezas: turbina, impulsor, prequemador, cámara, lattice, tobera, electrodos
+Resta canales y ductos internos
+Aplica filtros: DoOffset(), DoGaussianBlur()
+Exporta STL/3MF con Mesh.SaveToFile3Mf()
+
+8
+Escalar la geometría para un motor compacto tipo Noyron-Valox-XA103
+Advanced
+Usa transformaciones voxelizadas para compactar el motor.
+vox.Scale(new Vector3(1.1,1.1,0.85)) para compactar axialmente
+vox.Deform(v => v * Math.Sin(v.z*0.5)) para geometría interna tipo caracol
+vox.Modulate(QuasiCrystals.CreateQuasicrystalField()) para refuerzo aperiodico
+Ajusta espesores y radios según imágenes del Noyron TKL‑200
+
+9
+Validar geometría y preparar impresión 3D
+Final
+Asegura que la geometría es watertight y lista para fabricación.
+Verifica que no existan fugas en malla
+Comprueba booleanos correctos
+Exporta a 3MF para Eplus3D o SLM
+Usa NanoDB para análisis térmico UHTC‑Inconel
+************************************************************************************************************************************************************
+Objetivo:
+Ejecutar PicoGK con aceleración.
+Cargar LEAP71_ShapeKernel, HelixHeatX, QuasiCrystals, LatticeLibrary.
+Usar agentes inteligentes (KiloCode Agents + Chat).
+Integrar GitHub Copilot opcionalmente.
+Compilar y ejecutar EngineTasks.cs y Program.cs.
+Escalar geometrías del motor Noyron TKL‑200 / Valox / XA103.
+Añadir módulos UHTC‑Inconel, turbobomba NASA TM X‑419, tuberías internas, manifolds toroidales.
+Preparar el entorno para Rust (futuro).
