@@ -107,3 +107,4 @@ The pipeline is defined declaratively in `Pipeline/pipeline.json`:
 - .NET 9.0 SDK
 - PicoGK 1.7.7.4
 - LEAP71 ShapeKernel (optional, for advanced geometry)
+- link_CFD_ARM: https://amrex-codes.github.io/amrex/docs_html/AmrCore.html
