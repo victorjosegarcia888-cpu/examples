@@ -49,7 +49,7 @@ openvbd analysis:
 | Assembly | Modular engine assembly | `FFSC.Assembly` |
 | Viewer | PicoGK runtime viewer integration | `FFSC.Viewer` |
 
-pikohk - c++(openvbd) EB amREX physics//
+AI instructions: pikogk - c++(openvbd) EB amREX physics//
 Geometry
 ↓
 Mesh
@@ -61,6 +61,8 @@ Interpolation
 Implicit Function
 ↓
 EB2
+
+IMGUI/openGL visualization/renderization graphics/user interface similar to Java Applet in c++
 
 ## Quick Start
 
