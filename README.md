@@ -1,6 +1,12 @@
 # FFSC Rocket Engine - Modular Pipeline Architecture
 
 A full-flow staged combustion (FFSC) rocket engine design system built on PicoGK with a modular, graph-based execution pipeline.
+openvbd analysis: 
+1. https://www.openvdb.org/documentation/doxygen/namespaceopenvdb_1_1v13__1_1_1tools.html#adcddfc57ef94f93ff3806a45c26ca7d0
+2. https://github.com/victorjosegarcia888-cpu/nanodb/blob/main/openvdb/tools/TopologyToLevelSet.h
+3. https://www.openvdb.org/documentation/doxygen/Maps_8h.html
+4. AmreX/paraview https://amrex-codes.github.io/amrex/docs_html/EB.html
+5. imgui/openGL for graphics/pikogk runtime viewer
 
 ## Architecture
 
