@@ -49,6 +49,19 @@ openvbd analysis:
 | Assembly | Modular engine assembly | `FFSC.Assembly` |
 | Viewer | PicoGK runtime viewer integration | `FFSC.Viewer` |
 
+pikohk - c++(openvbd) EB amREX physics//
+Geometry
+↓
+Mesh
+↓
+SDF
+↓
+Interpolation
+↓
+Implicit Function
+↓
+EB2
+
 ## Quick Start
 
 ```bash
